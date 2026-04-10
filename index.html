@@ -1,0 +1,2442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sahasra | Sri Lanka's Premier Educational Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyARM8N5EINxpbn9ucxK1bWOe4RDm5_z_FU",
+            authDomain: "mcq--lk.firebaseapp.com",
+            projectId: "mcq--lk",
+            storageBucket: "mcq--lk.firebasestorage.app",
+            messagingSenderId: "842986756141",
+            appId: "1:842986756141:web:730e145fa230c7bd1640a4"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db   = firebase.firestore();
+        const auth = firebase.auth();
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;600;700&display=swap');
+        
+        :root {
+            --primary: #1e3a8a; /* Deep Ocean Blue */
+            --secondary: #047857; /* Emerald Green */
+            --accent: #f59e0b; /* Golden Amber */
+            --bg-light: #f8fafc;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-light);
+            color: #0f172a;
+            overflow-x: hidden;
+        }
+
+        .sinhala-text {
+            font-family: 'Noto Sans Sinhala', sans-serif;
+        }
+
+        /* Glassmorphism & Cards */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .hover-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            border: 1px solid #e2e8f0;
+        }
+
+        .hover-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+            border-color: var(--secondary);
+        }
+
+        /* Custom Gradients for A/L Streams */
+        .grad-maths { background: linear-gradient(135deg, #eff6ff, #dbeafe); border-color: #bfdbfe; }
+        .grad-bio { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-color: #bbf7d0; }
+        .grad-com { background: linear-gradient(135deg, #fef3c7, #fde68a); border-color: #fcd34d; }
+        .grad-arts { background: linear-gradient(135deg, #fdf2f8, #fce7f3); border-color: #fbcfe8; }
+        .grad-tech { background: linear-gradient(135deg, #f3f4f6, #e5e7eb); border-color: #d1d5db; }
+
+        /* Animations */
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Quiz UI */
+        .option-btn {
+            transition: all 0.2s;
+            border: 2px solid #e2e8f0;
+        }
+        .option-btn.selected {
+            border-color: var(--primary);
+            background-color: #eff6ff;
+            box-shadow: 0 4px 14px 0 rgba(30, 58, 138, 0.1);
+        }
+        
+        .hero-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23047857' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <header class="glass-header fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="navTo('home')">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-800 to-blue-600 flex items-center justify-center shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="text-white" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-extrabold text-blue-900 tracking-tight">SAHASRA</h1>
+                        <p class="text-[10px] uppercase tracking-widest text-emerald-700 font-bold -mt-1">Education Portal</p>
+                    </div>
+                </div>
+                
+                <nav class="hidden md:flex space-x-8 font-semibold text-slate-600">
+                    <a href="#" onclick="navTo('home')" class="hover:text-blue-600 transition">Home</a>
+                    <a href="#" onclick="navTo('home'); document.getElementById('grade-section').scrollIntoView({behavior: 'smooth'})" class="hover:text-blue-600 transition">Subjects</a>
+                    <a href="#" onclick="navTo('leaderboard')" class="hover:text-blue-600 transition">Leaderboard</a>
+                    <a href="#" onclick="navTo('about')" class="hover:text-blue-600 transition">About Us</a>
+                </nav>
+
+                <div class="flex items-center gap-4">
+                    <button id="nav-login-btn" onclick="openModal('login')" class="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-blue-600 text-blue-600 font-bold hover:bg-blue-50 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        Student Portal
+                    </button>
+                    <div id="nav-user-info" class="hidden items-center gap-3">
+                        <div class="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-200">
+                            <div class="w-7 h-7 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold" id="nav-avatar">?</div>
+                            <span id="nav-username" class="text-sm font-bold text-emerald-800">Student</span>
+                        </div>
+                        <button onclick="studentLogout()" class="text-xs font-bold text-slate-400 hover:text-red-500 transition px-2 py-1">Logout</button>
+                    </div>
+                    <button class="md:hidden text-slate-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow pt-20">
+        
+        <div id="view-home" class="fade-in-up">
+            
+            <section class="relative bg-white overflow-hidden border-b border-slate-200">
+                <div class="hero-pattern absolute inset-0 opacity-50"></div>
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 relative z-10">
+                    <div class="grid lg:grid-cols-2 gap-12 items-center">
+                        <div>
+                            <span class="inline-block py-1 px-3 rounded-full bg-emerald-100 text-emerald-800 text-sm font-bold tracking-wide mb-6">#1 Learning Platform in Sri Lanka</span>
+                            <h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight mb-4">
+                                Empowering Students to <span class="text-blue-600">Excel.</span>
+                            </h2>
+                            <h3 class="sinhala-text text-xl md:text-2xl text-emerald-700 font-bold mb-6 leading-relaxed">
+                                සහස්‍ර වෙත සාදරයෙන් පිළිගනිමු.<br>ශ්‍රී ලාංකේය සිසුන්ගේ අධ්‍යාපනය නංවාලීම සඳහා වූ විශිෂ්ටතම වේදිකාව.
+                            </h3>
+                            <p class="text-slate-600 text-lg mb-8 max-w-lg">
+                                Access thousands of past papers, term tests, and provincial exams. Track your progress securely and achieve your academic goals.
+                            </p>
+                            <button onclick="document.getElementById('grade-section').scrollIntoView({behavior: 'smooth'})" class="bg-blue-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-700 shadow-lg shadow-blue-200 transition transform hover:-translate-y-1">
+                                Start Practicing Now
+                            </button>
+                        </div>
+                        <div class="relative hidden lg:block">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-emerald-400 to-blue-500 rounded-3xl transform rotate-3 scale-105 opacity-20"></div>
+                            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Students studying" class="rounded-3xl shadow-2xl relative z-10 object-cover h-[500px] w-full border-4 border-white">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="grade-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">Select Your Grade</h2>
+                    <p class="text-slate-500 max-w-2xl mx-auto">Choose your academic level to access tailored examination materials and analytics.</p>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div id="grade-cards-grid" class="contents"></div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const grades = [
+                            {val: 6, label: "Grade 06", color: "blue"}, {val: 7, label: "Grade 07", color: "emerald"}, 
+                            {val: 8, label: "Grade 08", color: "amber"}, {val: 9, label: "Grade 09", color: "purple"},
+                            {val: 10, label: "Grade 10", color: "rose"}, {val: 11, label: "O/L Exam", color: "blue"},
+                            {val: 12, label: "A/L Year 1", color: "emerald"}, {val: 13, label: "A/L Year 2", color: "amber"}
+                        ];
+                        const container = document.getElementById('grade-cards-grid').parentElement;
+                        grades.forEach(g => {
+                            const div = document.createElement('div');
+                            div.onclick = () => selectGrade(g.val);
+                            div.className = 'hover-card p-8 rounded-3xl text-center cursor-pointer group';
+                            div.innerHTML = `
+                                <div class="w-16 h-16 mx-auto rounded-2xl bg-${g.color}-100 text-${g.color}-600 flex items-center justify-center text-2xl font-black mb-4 group-hover:scale-110 transition-transform">${g.val}</div>
+                                <h3 class="text-lg font-bold text-slate-800">${g.label}</h3>
+                                ${g.val >= 12 ? '<span class="inline-block mt-2 text-[10px] uppercase font-bold px-2 py-1 bg-slate-100 text-slate-500 rounded">Stream Selection</span>' : ''}
+                            `;
+                            container.insertBefore(div, document.getElementById('grade-cards-grid'));
+                        });
+                        document.getElementById('grade-cards-grid').remove();
+                    });
+                </script>
+                </div>
+            </section>
+        </div>
+
+        <section id="view-leaderboard" class="hidden max-w-5xl mx-auto px-4 py-20 fade-in-up">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-extrabold text-slate-900 mb-4">National Leaderboard</h2>
+                <p class="text-slate-500">Top performing students across Sri Lanka this month.</p>
+            </div>
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200">
+                            <th class="p-6 font-bold text-slate-600">Rank</th>
+                            <th class="p-6 font-bold text-slate-600">Student Name</th>
+                            <th class="p-6 font-bold text-slate-600">Grade</th>
+                            <th class="p-6 font-bold text-slate-600">Accuracy</th>
+                            <th class="p-6 font-bold text-slate-600">Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-slate-100 hover:bg-slate-50">
+                            <td class="p-6 font-black text-amber-500 text-xl">#1</td>
+                            <td class="p-6 font-bold text-slate-800">Kasun Perera</td>
+                            <td class="p-6 text-slate-600">Grade 11 (O/L)</td>
+                            <td class="p-6 text-emerald-600 font-bold">98%</td>
+                            <td class="p-6 font-black text-blue-600">12,450</td>
+                        </tr>
+                        <tr class="border-b border-slate-100 hover:bg-slate-50">
+                            <td class="p-6 font-black text-slate-400 text-xl">#2</td>
+                            <td class="p-6 font-bold text-slate-800">Fathima Zahra</td>
+                            <td class="p-6 text-slate-600">A/L Biology</td>
+                            <td class="p-6 text-emerald-600 font-bold">95%</td>
+                            <td class="p-6 font-black text-blue-600">11,200</td>
+                        </tr>
+                        <tr class="border-b border-slate-100 hover:bg-slate-50">
+                            <td class="p-6 font-black text-amber-700 text-xl">#3</td>
+                            <td class="p-6 font-bold text-slate-800">Kavindu Silva</td>
+                            <td class="p-6 text-slate-600">Grade 10</td>
+                            <td class="p-6 text-emerald-600 font-bold">92%</td>
+                            <td class="p-6 font-black text-blue-600">10,800</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-6 font-bold text-slate-400">#4</td>
+                            <td class="p-6 font-bold text-slate-800">Nithya Fernando</td>
+                            <td class="p-6 text-slate-600">A/L Commerce</td>
+                            <td class="p-6 text-emerald-600 font-bold">89%</td>
+                            <td class="p-6 font-black text-blue-600">9,950</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="view-about" class="hidden max-w-4xl mx-auto px-4 py-20 fade-in-up">
+            <div class="bg-white p-10 md:p-16 rounded-3xl shadow-sm border border-slate-200">
+                <h2 class="text-4xl font-extrabold text-slate-900 mb-6 text-center">About Sahasra</h2>
+                <div class="w-20 h-1 bg-blue-600 mx-auto mb-10 rounded-full"></div>
+                <p class="text-lg text-slate-600 leading-relaxed mb-6">
+                    Sahasra was built with a single mission: to democratize access to high-quality educational resources for every student in Sri Lanka. From rural schools to urban centers, we believe every child deserves the best preparation for their national examinations.
+                </p>
+                <p class="text-lg text-slate-600 leading-relaxed mb-8">
+                    Our platform aggregates past papers, term test papers from leading national schools, and provincial examination papers, transforming them into interactive, engaging quizzes that provide instant feedback and comprehensive analytics.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                    <div class="p-6 bg-blue-50 rounded-2xl">
+                        <div class="text-3xl font-black text-blue-600 mb-2">50K+</div>
+                        <div class="text-sm font-bold text-slate-700">Active Students</div>
+                    </div>
+                    <div class="p-6 bg-emerald-50 rounded-2xl">
+                        <div class="text-3xl font-black text-emerald-600 mb-2">10K+</div>
+                        <div class="text-sm font-bold text-slate-700">Papers Available</div>
+                    </div>
+                    <div class="p-6 bg-amber-50 rounded-2xl">
+                        <div class="text-3xl font-black text-amber-600 mb-2">100%</div>
+                        <div class="text-sm font-bold text-slate-700">Free Access</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             ADMIN DASHBOARD
+        ═══════════════════════════════════════════════════════════ -->
+        <section id="view-admin" class="hidden max-w-7xl mx-auto px-4 py-12 fade-in-up">
+
+            <!-- Top bar -->
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h2 class="text-3xl font-extrabold text-slate-900 flex items-center gap-3">
+                        <span class="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-amber-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </span>
+                        Admin Dashboard
+                    </h2>
+                    <p class="text-slate-500 mt-1">Manage papers, upload questions, and monitor platform activity.</p>
+                </div>
+                <button onclick="adminLogout()" class="flex items-center gap-2 px-5 py-2.5 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-red-50 hover:text-red-600 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Logout
+                </button>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 border-l-4 border-blue-500 shadow-sm">
+                    <p class="text-xs font-bold text-slate-400 uppercase mb-1">Registered Users</p>
+                    <p class="text-3xl font-black text-slate-800">52,481</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 border-l-4 border-emerald-500 shadow-sm">
+                    <p class="text-xs font-bold text-slate-400 uppercase mb-1">Papers in DB</p>
+                    <p id="admin-total-papers" class="text-3xl font-black text-slate-800">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 border-l-4 border-amber-500 shadow-sm">
+                    <p class="text-xs font-bold text-slate-400 uppercase mb-1">Total Questions</p>
+                    <p id="admin-total-q" class="text-3xl font-black text-slate-800">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 border-l-4 border-purple-500 shadow-sm">
+                    <p class="text-xs font-bold text-slate-400 uppercase mb-1">Total Attempts</p>
+                    <p id="admin-total-attempts" class="text-3xl font-black text-slate-800">0</p>
+                </div>
+            </div>
+
+            <!-- Two-column layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                <!-- LEFT: Upload Wizard -->
+                <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+
+                    <!-- Wizard progress bar -->
+                    <div class="bg-slate-50 border-b border-slate-200 px-8 py-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-lg font-extrabold text-slate-900">📄 Upload New Paper Wizard</h3>
+                            <span id="wiz-step-label" class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">Step 1 of 4</span>
+                        </div>
+                        <div class="flex gap-1.5">
+                            <div id="wiz-bar-1" class="h-2 flex-1 rounded-full bg-blue-600 transition-all"></div>
+                            <div id="wiz-bar-2" class="h-2 flex-1 rounded-full bg-slate-200 transition-all"></div>
+                            <div id="wiz-bar-3" class="h-2 flex-1 rounded-full bg-slate-200 transition-all"></div>
+                            <div id="wiz-bar-4" class="h-2 flex-1 rounded-full bg-slate-200 transition-all"></div>
+                        </div>
+                    </div>
+
+                    <div class="p-8">
+
+                        <!-- ── STEP 1: Paper Details ── -->
+                        <div id="wiz-step-1">
+                            <h4 class="text-xl font-extrabold text-slate-800 mb-1">Step 1 — Paper Details</h4>
+                            <p class="text-slate-500 text-sm mb-6">Select the grade, subject, paper type, year and term for this paper.</p>
+
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-bold text-slate-700 mb-1">Grade <span class="text-red-500">*</span></label>
+                                        <select id="wiz-grade" onchange="wizUpdateStream(); wizUpdateSubject();" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-semibold">
+                                            <option value="">— Select Grade —</option>
+                                            <option value="Grade 6">Grade 6</option>
+                                            <option value="Grade 7">Grade 7</option>
+                                            <option value="Grade 8">Grade 8</option>
+                                            <option value="Grade 9">Grade 9</option>
+                                            <option value="Grade 10">Grade 10</option>
+                                            <option value="Grade 11">Grade 11 (O/L)</option>
+                                            <option value="Grade 12">Grade 12 (A/L Year 1)</option>
+                                            <option value="Grade 13">Grade 13 (A/L Year 2)</option>
+                                        </select>
+                                    </div>
+                                    <div id="wiz-stream-wrap" class="hidden">
+                                        <label class="block text-sm font-bold text-slate-700 mb-1">Stream <span class="text-red-500">*</span></label>
+                                        <select id="wiz-stream" onchange="wizUpdateSubject()" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-semibold">
+                                            <option value="Physical Science (Maths)">Physical Science (Maths)</option>
+                                            <option value="Biological Science">Biological Science</option>
+                                            <option value="Commerce">Commerce</option>
+                                            <option value="Arts">Arts</option>
+                                            <option value="Technology">Technology</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold text-slate-700 mb-1">Subject <span class="text-red-500">*</span></label>
+                                        <select id="wiz-subject" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-semibold">
+                                            <option value="">— Select Grade first —</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold text-slate-700 mb-1">Paper Type <span class="text-red-500">*</span></label>
+                                        <select id="wiz-paper-type" onchange="wizToggleTerm()" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-semibold">
+                                            <option value="">— Select Type —</option>
+                                            <option value="National Past Papers">National Past Papers</option>
+                                            <option value="School Term Papers">School Term Papers</option>
+                                            <option value="Provincial Papers">Provincial Papers</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold text-slate-700 mb-1">Examination Year <span class="text-red-500">*</span></label>
+                                        <select id="wiz-year" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-semibold">
+                                            <option value="">— Select Year —</option>
+                                            <option>2024</option><option>2023</option><option>2022</option>
+                                            <option>2021</option><option>2020</option><option>2019</option>
+                                            <option>2018</option><option>2017</option><option>2016</option><option>2015</option>
+                                        </select>
+                                    </div>
+                                    <!-- Term Section — always visible -->
+                                    <div id="wiz-term-wrap" class="md:col-span-2">
+                                        <label class="block text-sm font-bold text-slate-700 mb-2">
+                                            Term
+                                            <span id="wiz-term-required-star" class="text-red-500 hidden"> *</span>
+                                            <span id="wiz-term-optional-badge" class="ml-2 text-[10px] font-bold bg-slate-100 text-slate-400 px-2 py-0.5 rounded-full uppercase tracking-wide">Optional for Past Papers</span>
+                                        </label>
+                                        <div class="grid grid-cols-3 gap-3">
+                                            <!-- 1st Term -->
+                                            <label class="relative flex flex-col items-center gap-2 px-4 py-4 rounded-2xl border-2 border-slate-200 cursor-pointer hover:border-blue-400 transition-all
+                                                          has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 has-[:checked]:shadow-md group">
+                                                <input type="radio" name="wiz-term" value="First Term" class="sr-only">
+                                                <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg font-black group-has-[:checked]:bg-blue-600 group-has-[:checked]:text-white transition-colors">1</div>
+                                                <div class="text-center">
+                                                    <p class="font-extrabold text-slate-800 text-sm leading-tight">1st Term</p>
+                                                    <p class="text-[10px] text-slate-400 font-semibold mt-0.5 uppercase tracking-wide">First Term Test</p>
+                                                </div>
+                                                <div class="absolute top-2 right-2 w-4 h-4 rounded-full border-2 border-slate-300 group-has-[:checked]:border-blue-600 group-has-[:checked]:bg-blue-600 flex items-center justify-center transition-all">
+                                                    <svg class="hidden group-has-[:checked]:block text-white" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                                </div>
+                                            </label>
+                                            <!-- 2nd Term -->
+                                            <label class="relative flex flex-col items-center gap-2 px-4 py-4 rounded-2xl border-2 border-slate-200 cursor-pointer hover:border-emerald-400 transition-all
+                                                          has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50 has-[:checked]:shadow-md group">
+                                                <input type="radio" name="wiz-term" value="Second Term" class="sr-only">
+                                                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg font-black group-has-[:checked]:bg-emerald-600 group-has-[:checked]:text-white transition-colors">2</div>
+                                                <div class="text-center">
+                                                    <p class="font-extrabold text-slate-800 text-sm leading-tight">2nd Term</p>
+                                                    <p class="text-[10px] text-slate-400 font-semibold mt-0.5 uppercase tracking-wide">Second Term Test</p>
+                                                </div>
+                                                <div class="absolute top-2 right-2 w-4 h-4 rounded-full border-2 border-slate-300 group-has-[:checked]:border-emerald-600 group-has-[:checked]:bg-emerald-600 flex items-center justify-center transition-all">
+                                                    <svg class="hidden group-has-[:checked]:block text-white" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                                </div>
+                                            </label>
+                                            <!-- 3rd Term -->
+                                            <label class="relative flex flex-col items-center gap-2 px-4 py-4 rounded-2xl border-2 border-slate-200 cursor-pointer hover:border-amber-400 transition-all
+                                                          has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 has-[:checked]:shadow-md group">
+                                                <input type="radio" name="wiz-term" value="Third Term" class="sr-only">
+                                                <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg font-black group-has-[:checked]:bg-amber-500 group-has-[:checked]:text-white transition-colors">3</div>
+                                                <div class="text-center">
+                                                    <p class="font-extrabold text-slate-800 text-sm leading-tight">3rd Term</p>
+                                                    <p class="text-[10px] text-slate-400 font-semibold mt-0.5 uppercase tracking-wide">Third Term Test</p>
+                                                </div>
+                                                <div class="absolute top-2 right-2 w-4 h-4 rounded-full border-2 border-slate-300 group-has-[:checked]:border-amber-500 group-has-[:checked]:bg-amber-500 flex items-center justify-center transition-all">
+                                                    <svg class="hidden group-has-[:checked]:block text-white" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1">Paper Name <span class="text-red-500">*</span></label>
+                                    <input type="text" id="wiz-paper-name" placeholder="e.g. Royal College 2023 1st Term Science Paper" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-semibold">
+                                </div>
+                            </div>
+
+                            <div class="mt-8 flex justify-end">
+                                <button onclick="wizStep1Next()" class="px-8 py-3.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-100 transition flex items-center gap-2">
+                                    Next: Add Questions
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ── STEP 2: Add Questions ── -->
+                        <div id="wiz-step-2" class="hidden">
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <h4 class="text-xl font-extrabold text-slate-800 mb-1">Step 2 — Add Questions</h4>
+                                    <p id="wiz-paper-context" class="text-sm text-blue-700 font-semibold bg-blue-50 px-3 py-1.5 rounded-lg inline-block mt-1"></p>
+                                </div>
+                                <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2 text-center">
+                                    <div id="wiz-q-count" class="text-2xl font-black text-emerald-600">0</div>
+                                    <div class="text-[10px] font-bold text-emerald-500 uppercase">Questions Added</div>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-50 rounded-2xl border border-slate-200 p-6 space-y-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1">Question Text <span class="text-red-500">*</span></label>
+                                    <textarea id="wiz-q-text" rows="3" placeholder="Type the MCQ question here..." class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none resize-none font-medium text-slate-800"></textarea>
+                                </div>
+
+                                <!-- Optional Image Upload -->
+                                <div class="bg-white border-2 border-dashed border-slate-200 rounded-xl p-4">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <label class="text-sm font-bold text-slate-700 flex items-center gap-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                            Question Image <span class="text-xs font-normal text-slate-400 ml-1">(Optional)</span>
+                                        </label>
+                                        <button type="button" id="wiz-img-clear-btn" onclick="wizClearImage()" class="hidden text-xs text-red-500 hover:text-red-700 font-bold flex items-center gap-1 transition">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                            Remove
+                                        </button>
+                                    </div>
+                                    <div id="wiz-img-drop-zone" onclick="document.getElementById('wiz-img-input').click()"
+                                         class="flex flex-col items-center justify-center gap-2 py-5 cursor-pointer rounded-xl hover:bg-slate-50 transition text-slate-400 text-sm font-medium">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                        <span>Click to upload image <span class="text-blue-500 font-bold">(PNG, JPG, GIF)</span></span>
+                                        <span class="text-xs text-slate-300">Max 2 MB — stored as base64</span>
+                                    </div>
+                                    <img id="wiz-img-preview" src="" alt="Preview" class="hidden w-full max-h-48 object-contain rounded-xl border border-slate-200 mt-2 bg-white">
+                                    <input type="file" id="wiz-img-input" accept="image/*" class="hidden" onchange="wizHandleImageUpload(event)">
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="wiz-options-grid">
+                                    <div class="relative">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg bg-blue-100 text-blue-700 text-xs font-black flex items-center justify-center">A</span>
+                                        <input type="text" id="wiz-opt-0" placeholder="Option A" class="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-medium">
+                                    </div>
+                                    <div class="relative">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 text-xs font-black flex items-center justify-center">B</span>
+                                        <input type="text" id="wiz-opt-1" placeholder="Option B" class="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-medium">
+                                    </div>
+                                    <div class="relative">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg bg-amber-100 text-amber-700 text-xs font-black flex items-center justify-center">C</span>
+                                        <input type="text" id="wiz-opt-2" placeholder="Option C" class="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-medium">
+                                    </div>
+                                    <div class="relative">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg bg-rose-100 text-rose-700 text-xs font-black flex items-center justify-center">D</span>
+                                        <input type="text" id="wiz-opt-3" placeholder="Option D" class="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-medium">
+                                    </div>
+                                    <!-- Option E (hidden by default) -->
+                                    <div id="wiz-opt-e-wrap" class="relative hidden md:col-span-2">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg bg-purple-100 text-purple-700 text-xs font-black flex items-center justify-center">E</span>
+                                        <input type="text" id="wiz-opt-4" placeholder="Option E" class="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-purple-500 outline-none font-medium">
+                                    </div>
+                                </div>
+
+                                <!-- Add / Remove Option E button -->
+                                <div class="flex items-center gap-3">
+                                    <button type="button" id="wiz-toggle-e-btn" onclick="wizToggleOptionE()" class="flex items-center gap-2 px-4 py-2 text-xs font-bold text-purple-600 bg-purple-50 border border-purple-200 rounded-xl hover:bg-purple-100 transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                                        Add Option E
+                                    </button>
+                                    <span class="text-xs text-slate-400">Some papers use 5-choice MCQs</span>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-sm font-bold text-slate-700 mb-1">Correct Answer <span class="text-red-500">*</span></label>
+                                        <select id="wiz-correct" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-emerald-500 outline-none font-bold text-emerald-700">
+                                            <option value="0">✅ Option A</option>
+                                            <option value="1">✅ Option B</option>
+                                            <option value="2">✅ Option C</option>
+                                            <option value="3">✅ Option D</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold text-slate-700 mb-1">Explanation (Optional)</label>
+                                        <input type="text" id="wiz-explanation" placeholder="Why is this the correct answer?" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-medium">
+                                    </div>
+                                </div>
+                                <button onclick="wizAddQuestion()" class="w-full py-3.5 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-100">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                                    Add This Question
+                                </button>
+                            </div>
+
+                            <!-- Added questions mini-list -->
+                            <div id="wiz-q-list" class="mt-4 space-y-2 max-h-60 overflow-y-auto"></div>
+
+                            <div class="mt-6 flex justify-between">
+                                <button onclick="wizGoStep(1)" class="px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+                                    Back
+                                </button>
+                                <button onclick="wizStep2Next()" class="px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition flex items-center gap-2 shadow-lg shadow-blue-100">
+                                    Next: Review
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ── STEP 3: Review ── -->
+                        <div id="wiz-step-3" class="hidden">
+                            <h4 class="text-xl font-extrabold text-slate-800 mb-1">Step 3 — Review Paper</h4>
+                            <p class="text-slate-500 text-sm mb-6">Check all details before publishing to the student database.</p>
+
+                            <div id="wiz-review-content" class="space-y-4"></div>
+
+                            <div class="mt-6 flex justify-between">
+                                <button onclick="wizGoStep(2)" class="px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+                                    Back
+                                </button>
+                                <button onclick="wizPublish()" class="px-8 py-3.5 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition flex items-center gap-2 shadow-lg shadow-emerald-100">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    Publish Paper to Database
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ── STEP 4: Success ── -->
+                        <div id="wiz-step-4" class="hidden text-center py-8">
+                            <div class="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="text-emerald-600" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            </div>
+                            <h4 class="text-2xl font-extrabold text-slate-900 mb-2">Paper Published! 🎉</h4>
+                            <p id="wiz-success-msg" class="text-slate-500 mb-8"></p>
+                            <div class="flex gap-4 justify-center">
+                                <button onclick="wizReset()" class="px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition">
+                                    Upload Another Paper
+                                </button>
+                                <button onclick="wizViewPublished()" class="px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition">
+                                    View Published Papers
+                                </button>
+                            </div>
+                        </div>
+
+                    </div><!-- /p-8 -->
+                </div><!-- /wizard card -->
+
+                <!-- RIGHT SIDEBAR -->
+                <div class="space-y-5">
+
+                    <!-- Published Papers Panel -->
+                    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                            <h4 class="font-extrabold text-slate-800">Published Papers</h4>
+                            <span id="published-count" class="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">0</span>
+                        </div>
+                        <div id="published-papers-list" class="divide-y divide-slate-100 max-h-72 overflow-y-auto">
+                            <p class="text-sm text-slate-400 text-center py-6">No papers published yet.</p>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-3">
+                        <h4 class="font-extrabold text-slate-800 mb-2">Quick Actions</h4>
+                        <div class="p-4 rounded-xl border border-slate-100 hover:border-blue-300 cursor-pointer transition group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-100 transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                                </div>
+                                <div><p class="font-bold text-slate-800 text-sm">Manage Students</p><p class="text-xs text-slate-400">View progress & accounts</p></div>
+                            </div>
+                        </div>
+                        <div class="p-4 rounded-xl border border-slate-100 hover:border-amber-300 cursor-pointer transition group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center group-hover:bg-amber-100 transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                </div>
+                                <div><p class="font-bold text-slate-800 text-sm">Reported Questions</p><p class="text-xs text-slate-400">Review flagged items</p></div>
+                            </div>
+                        </div>
+                        <div class="p-4 rounded-xl border border-slate-100 hover:border-slate-300 cursor-pointer transition group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-lg bg-slate-50 text-slate-600 flex items-center justify-center group-hover:bg-slate-100 transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+                                </div>
+                                <div><p class="font-bold text-slate-800 text-sm">System Settings</p><p class="text-xs text-slate-400">Configure platform</p></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /sidebar -->
+            </div><!-- /grid -->
+        </section>
+
+        <section id="view-stream" class="hidden max-w-7xl mx-auto px-4 py-20 fade-in-up">
+            <div class="mb-10">
+                <button onclick="navTo('home')" class="flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold mb-6 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    Back to Grades
+                </button>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900">Advanced Level Streams</h2>
+                <p class="text-slate-500 mt-2">Select your academic stream for Grade <span id="stream-grade-display"></span>.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div onclick="selectStream('Physical Science (Maths)')" class="hover-card grad-maths p-8 rounded-3xl cursor-pointer">
+                    <div class="text-4xl mb-4">📐</div>
+                    <h3 class="text-xl font-bold text-slate-900">Physical Science</h3>
+                    <p class="text-sm text-slate-600 mt-1">Combined Mathematics, Physics, Chemistry / ICT</p>
+                </div>
+                <div onclick="selectStream('Biological Science')" class="hover-card grad-bio p-8 rounded-3xl cursor-pointer">
+                    <div class="text-4xl mb-4">🧬</div>
+                    <h3 class="text-xl font-bold text-slate-900">Biological Science</h3>
+                    <p class="text-sm text-slate-600 mt-1">Biology, Physics, Chemistry / Agriculture</p>
+                </div>
+                <div onclick="selectStream('Commerce')" class="hover-card grad-com p-8 rounded-3xl cursor-pointer">
+                    <div class="text-4xl mb-4">📊</div>
+                    <h3 class="text-xl font-bold text-slate-900">Commerce</h3>
+                    <p class="text-sm text-slate-600 mt-1">Accounting, Business Studies, Economics</p>
+                </div>
+                <div onclick="selectStream('Arts')" class="hover-card grad-arts p-8 rounded-3xl cursor-pointer">
+                    <div class="text-4xl mb-4">🎨</div>
+                    <h3 class="text-xl font-bold text-slate-900">Arts & Humanities</h3>
+                    <p class="text-sm text-slate-600 mt-1">Languages, Logic, Geography, History</p>
+                </div>
+                <div onclick="selectStream('Technology')" class="hover-card grad-tech p-8 rounded-3xl cursor-pointer">
+                    <div class="text-4xl mb-4">⚙️</div>
+                    <h3 class="text-xl font-bold text-slate-900">Technology</h3>
+                    <p class="text-sm text-slate-600 mt-1">ET / BST / SFT / ICT</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-subjects" class="hidden max-w-7xl mx-auto px-4 py-20 fade-in-up">
+            <div class="mb-10">
+                <button id="subjects-back-btn" onclick="goBackFromSubjects()" class="flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold mb-6 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    Back
+                </button>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900">Select Subject</h2>
+                <p id="subject-meta-subtitle" class="text-slate-500 mt-2 font-medium"></p>
+            </div>
+            
+            <div id="subjects-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                </div>
+        </section>
+
+        <section id="view-papers" class="hidden max-w-7xl mx-auto px-4 py-20 fade-in-up">
+            <div class="mb-10">
+                <button onclick="goBackFromPapers()" class="flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold mb-6 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    Back to Subjects
+                </button>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900">Select Paper Category</h2>
+                <p id="paper-meta-subtitle" class="text-slate-500 mt-2 font-medium"></p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div onclick="selectPaper('National Past Papers')" class="hover-card p-10 rounded-3xl cursor-pointer text-center">
+                    <div class="w-20 h-20 mx-auto bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3 text-slate-800">Past Papers</h3>
+                    <p class="text-slate-500">Official Dept of Examination papers (2015-2023).</p>
+                </div>
+                <div onclick="selectPaper('School Term Papers')" class="hover-card p-10 rounded-3xl cursor-pointer text-center">
+                    <div class="w-20 h-20 mx-auto bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 10 9-10 9-10-9 10-9z"/><path d="m2 12 10 9 10-9"/></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3 text-slate-800">School Papers</h3>
+                    <p class="text-slate-500">Curated papers from Royal, Ananda, and Visakha.</p>
+                </div>
+                <div onclick="selectPaper('Provincial Papers')" class="hover-card p-10 rounded-3xl cursor-pointer text-center">
+                    <div class="w-20 h-20 mx-auto bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3 text-slate-800">Provincial</h3>
+                    <p class="text-slate-500">Tests from Western, Central, and Southern provinces.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-quiz" class="hidden max-w-4xl mx-auto px-4 py-12 fade-in-up">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div>
+                    <button onclick="goBackFromQuiz()" class="flex items-center gap-1 text-blue-600 font-bold mb-2 text-sm hover:underline">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            Back to Papers
+        </button>
+        
+                    <h2 id="quiz-title" class="text-xl font-extrabold text-slate-900 uppercase tracking-tight"></h2>
+                    <p id="quiz-meta" class="text-sm text-slate-500 font-medium"></p>
+                </div>
+                <div class="bg-slate-50 px-6 py-3 rounded-xl flex items-center gap-3 border border-slate-200">
+                    <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                    <span id="timer" class="font-mono font-bold text-xl text-slate-800">00:00</span>
+                </div>
+            </div>
+
+            <div class="w-full h-2 bg-slate-200 rounded-full mb-8 overflow-hidden">
+                <div id="progress-fill" class="h-full bg-blue-600 transition-all duration-300" style="width: 10%"></div>
+            </div>
+
+            <div class="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-slate-200 mb-8">
+                <div id="q-counter" class="text-xs font-bold text-blue-600 uppercase tracking-widest mb-6">Question 1 of 5</div>
+                <h3 id="question-text" class="text-xl md:text-2xl font-bold text-slate-800 leading-relaxed mb-6"></h3>
+                <div id="question-image-wrap" class="hidden mb-8">
+                    <img id="question-image" src="" alt="Question image" class="max-h-64 w-auto rounded-2xl border border-slate-200 shadow-sm object-contain mx-auto block">
+                </div>
+                
+                <div id="options-container" class="grid grid-cols-1 gap-4">
+                    </div>
+            </div>
+
+            <div class="flex justify-between items-center">
+                <button id="prev-btn" onclick="prevQuestion()" class="hidden bg-slate-200 text-slate-700 px-8 py-4 font-bold rounded-2xl hover:bg-slate-300 transition">
+        Previous
+    </button>
+                <button id="next-btn" disabled onclick="nextQuestion()" class="bg-blue-600 text-white px-10 py-4 font-bold rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 shadow-lg shadow-blue-200 transition">
+                    Next Question
+                </button>
+            </div>
+        </section>
+
+        <section id="view-results" class="hidden max-w-5xl mx-auto px-4 py-12 fade-in-up">
+            <div class="bg-white p-10 rounded-[2rem] shadow-sm border-t-8 border-emerald-500 mb-8 text-center relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-8 opacity-5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <h2 class="text-4xl font-extrabold text-slate-900 mb-2">Performance Analysis</h2>
+                <p id="res-paper-info" class="text-slate-500 font-medium mb-10"></p>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+                    <div class="p-6 rounded-2xl bg-slate-50 border border-slate-100">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Final Score</div>
+                        <div id="res-score" class="text-4xl font-black text-blue-600">0%</div>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-slate-50 border border-slate-100">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Correct Answers</div>
+                        <div id="res-correct" class="text-4xl font-black text-emerald-600">0</div>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-slate-50 border border-slate-100">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Time Elapsed</div>
+                        <div id="res-time" class="text-4xl font-black text-slate-700">00:00</div>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-slate-50 border border-slate-100">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Grade Rank</div>
+                        <div id="res-rank" class="text-4xl font-black text-amber-500">B</div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="navTo('home')" class="px-8 py-4 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition">🏠 Home</button>
+                    <button onclick="retryCurrentPaper()" class="px-8 py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition">🔁 Retry This Paper</button>
+                    <button onclick="showPaperList()" class="px-8 py-4 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-200 transition">📂 All Papers</button>
+                </div>
+            </div>
+
+            <div class="space-y-6 pb-10">
+                <h3 class="text-2xl font-bold text-slate-900 flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="text-emerald-600" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                    Question Breakdown & Explanations
+                </h3>
+                <div id="mistake-list" class="space-y-4">
+                    </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-12 mt-auto border-t-4 border-blue-600">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="col-span-1 md:col-span-2">
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="w-8 h-8 rounded bg-blue-600 flex items-center justify-center text-white font-bold">S</div>
+                    <h2 class="text-xl font-extrabold text-white tracking-widest">SAHASRA</h2>
+                </div>
+                <p class="text-sm mb-6 max-w-sm">
+                    Sri Lanka's most comprehensive online examination platform. Designed for students to excel in O/L and A/L examinations with real-time analytics and secure progress tracking.
+                </p>
+                <p class="text-xs">© 2026 Sahasra Education. All rights reserved.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-sm">Quick Links</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" onclick="navTo('home')" class="hover:text-blue-400 transition">Home</a></li>
+                    <li><a href="#" onclick="navTo('leaderboard')" class="hover:text-blue-400 transition">Student Leaderboard</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-sm">Administration</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" onclick="openModal('admin')" class="hover:text-amber-400 transition flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Admin Secure Login</a></li>
+                    <li><a href="#" onclick="openModal('admin')" class="hover:text-amber-400 transition flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg> Paper Management</a></li>
+                    <li><a href="#" class="hover:text-amber-400 transition flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Teacher Portal</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <div id="auth-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative fade-in-up my-8">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            
+            <div class="text-center mb-6">
+                <div id="modal-icon" class="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold mx-auto mb-4">S</div>
+                <h3 id="modal-title" class="text-2xl font-extrabold text-slate-900">Student Portal</h3>
+                <p id="modal-subtitle" class="text-sm text-slate-500 mt-1 flex items-center justify-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    256-bit Encrypted Connection
+                </p>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <form id="form-login" onsubmit="event.preventDefault(); studentLogin();" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Email Address</label>
+                    <input type="email" id="login-email" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition" placeholder="your@email.com" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Password</label>
+                    <input type="password" id="login-pass" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition" placeholder="••••••••" required>
+                </div>
+                <p id="login-error" class="text-red-500 text-sm hidden"></p>
+                <button type="submit" id="login-btn" class="w-full py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition mt-4">
+                    Secure Login
+                </button>
+                <div class="mt-6 text-center text-sm text-slate-500">
+                    Don't have an account? <button type="button" onclick="switchModalMode('register')" class="text-blue-600 font-bold hover:underline">Register Here</button>
+                </div>
+            </form>
+            <!-- REGISTER FORM -->
+            <form id="form-register" onsubmit="event.preventDefault(); studentRegister();" class="space-y-4 hidden">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">Full Name <span class="text-red-500">*</span></label>
+                        <input type="text" id="reg-name" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition" placeholder="Your full name" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">Grade <span class="text-red-500">*</span></label>
+                        <select id="reg-grade" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 outline-none font-semibold" required>
+                            <option value="">— Grade —</option>
+                            <option>Grade 6</option><option>Grade 7</option><option>Grade 8</option>
+                            <option>Grade 9</option><option>Grade 10</option><option>Grade 11</option>
+                            <option>Grade 12</option><option>Grade 13</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">School Name</label>
+                    <input type="text" id="reg-school" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition" placeholder="e.g. Royal College, Colombo">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Email Address <span class="text-red-500">*</span></label>
+                    <input type="email" id="reg-email" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition" placeholder="your@email.com" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Password <span class="text-red-500">*</span></label>
+                    <input type="password" id="reg-pass" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition" placeholder="Min 6 characters" required minlength="6">
+                </div>
+                <p id="reg-error" class="text-red-500 text-sm hidden"></p>
+                <button type="submit" id="reg-btn" class="w-full py-4 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-200 transition mt-2">
+                    Create My Account
+                </button>
+                <div class="mt-4 text-center text-sm text-slate-500">
+                    Already have an account? <button type="button" onclick="switchModalMode('login')" class="text-blue-600 font-bold hover:underline">Login Here</button>
+                </div>
+            </form>
+
+            <form id="form-admin" onsubmit="event.preventDefault(); loginAdmin();" class="space-y-4 hidden">
+                <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-xs text-amber-800 font-semibold flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Sign in with your Firebase admin email account
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Admin Email</label>
+                    <input type="email" id="admin-email" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-100 outline-none transition" placeholder="admin@youremail.com" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Password</label>
+                    <input type="password" id="admin-pass" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-100 outline-none transition" placeholder="••••••••" required>
+                </div>
+                <p id="admin-error" class="text-red-500 text-sm hidden"></p>
+                <button type="submit" id="admin-btn" class="w-full py-4 bg-slate-900 text-amber-400 font-bold rounded-xl hover:bg-slate-800 shadow-lg shadow-slate-200 transition mt-4">
+                    Access Admin Dashboard
+                </button>
+                <div class="mt-6 text-center text-sm text-slate-500">
+                    Student? <button type="button" onclick="switchModalMode('login')" class="text-blue-600 font-bold hover:underline">Return to Student Portal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+          
+        // ============================================================
+        
+        // ============================================================
+        //  SAHASRA – FIREBASE INTEGRATED
+        // ============================================================
+
+        // ============================================================
+        //  ALL GLOBAL VARIABLES — declared first to avoid TDZ errors
+        // ============================================================
+
+        let currentStudent = null;
+
+        // ── IMPORTANT: Set this to the email you added in Firebase Auth as admin ──
+        const ADMIN_EMAIL = "Chanakaprasan848@gmail.com";
+
+        // App navigation + quiz state
+        let state = {
+            grade: null, stream: null, subject: null,
+            paperType: null, selectedYear: null, selectedTerm: null,
+            activePaperId: null, activePaperName: null,
+            subView: 'subjects',
+            currentIndex: 0, userAnswers: [], timer: 0, timerInterval: null
+        };
+
+        // Admin wizard state
+        let wizState = { step: 1, questions: [], paperMeta: {} };
+
+        // Data stores
+        let publishedPapers      = [];
+        let studentSubmissions   = [];
+
+        // Subject map
+        const SUBJECTS_BY_LEVEL = {
+            "6":  ["Science","Mathematics","English","History","Geography","Sinhala","ICT","Civics"],
+            "7":  ["Science","Mathematics","English","History","Geography","Sinhala","ICT","Civics"],
+            "8":  ["Science","Mathematics","English","History","Geography","Sinhala","ICT","Civics"],
+            "9":  ["Science","Mathematics","English","History","Geography","Sinhala","ICT","Civics"],
+            "10": ["Science","Mathematics","English","History","Geography","Sinhala","ICT","Commerce","Citizenship"],
+            "11": ["Science","Mathematics","English","History","Geography","Sinhala","ICT","Commerce","Citizenship"],
+            "Physical Science":  ["Combined Mathematics","Physics","Chemistry","ICT"],
+            "Biological Science":["Biology","Physics","Chemistry","Agricultural Science"],
+            "Commerce":  ["Accounting","Business Studies","Economics","ICT"],
+            "Arts":      ["Sinhala","Logic","Political Science","Geography","History"],
+            "Technology":["Engineering Tech","Bio Systems Tech","Science for Tech","ICT"]
+        };
+
+
+        // ── Firebase Auth state listener ──
+        auth.onAuthStateChanged(async (user) => {
+            const loginBtn = document.getElementById('nav-login-btn');
+            const userInfo = document.getElementById('nav-user-info');
+            const avatar   = document.getElementById('nav-avatar');
+            const nameEl   = document.getElementById('nav-username');
+
+            if (user) {
+                const isAdmin = user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+
+                if (isAdmin) {
+                    // Admin signed in — keep header clean (no student pill)
+                    currentStudent = null;
+                    if (loginBtn) loginBtn.classList.remove('hidden');
+                    if (userInfo) { userInfo.classList.add('hidden'); userInfo.classList.remove('flex'); }
+                } else {
+                    // Regular student signed in
+                    try {
+                        const doc  = await db.collection('students').doc(user.uid).get();
+                        const data = doc.exists ? doc.data() : {};
+                        currentStudent = { uid: user.uid, email: user.email, name: data.name || user.email.split('@')[0], grade: data.grade || '', school: data.school || '' };
+                    } catch(e) {
+                        currentStudent = { uid: user.uid, email: user.email, name: user.email.split('@')[0], grade: '', school: '' };
+                    }
+                    if (loginBtn) loginBtn.classList.add('hidden');
+                    if (userInfo) { userInfo.classList.remove('hidden'); userInfo.classList.add('flex'); }
+                    if (avatar)   avatar.textContent = currentStudent.name.charAt(0).toUpperCase();
+                    if (nameEl)   nameEl.textContent  = currentStudent.name;
+                }
+            } else {
+                currentStudent = null;
+                if (loginBtn) loginBtn.classList.remove('hidden');
+                if (userInfo) { userInfo.classList.add('hidden'); userInfo.classList.remove('flex'); }
+            }
+        });
+
+        // ── Student Login via Firebase Auth ──
+        async function studentLogin() {
+            const email = document.getElementById('login-email').value.trim();
+            const pass  = document.getElementById('login-pass').value;
+            const btn   = document.getElementById('login-btn');
+            const err   = document.getElementById('login-error');
+            err.classList.add('hidden');
+            btn.textContent = 'Logging in...';
+            btn.disabled = true;
+            try {
+                await auth.signInWithEmailAndPassword(email, pass);
+                closeModal();
+            } catch(e) {
+                err.textContent = e.code === 'auth/user-not-found' ? 'No account found with this email.' :
+                                  e.code === 'auth/wrong-password' ? 'Wrong password. Please try again.' :
+                                  'Login failed: ' + e.message;
+                err.classList.remove('hidden');
+            }
+            btn.textContent = 'Secure Login';
+            btn.disabled = false;
+        }
+
+        // ── Student Register via Firebase Auth + save profile to Firestore ──
+        async function studentRegister() {
+            const name   = document.getElementById('reg-name').value.trim();
+            const grade  = document.getElementById('reg-grade').value;
+            const school = document.getElementById('reg-school').value.trim();
+            const email  = document.getElementById('reg-email').value.trim();
+            const pass   = document.getElementById('reg-pass').value;
+            const btn    = document.getElementById('reg-btn');
+            const err    = document.getElementById('reg-error');
+            if (!name || !grade || !email || !pass) { err.textContent = 'Please fill in all required fields.'; err.classList.remove('hidden'); return; }
+            err.classList.add('hidden');
+            btn.textContent = 'Creating account...';
+            btn.disabled = true;
+            try {
+                const cred = await auth.createUserWithEmailAndPassword(email, pass);
+                await db.collection('students').doc(cred.user.uid).set({ name, grade, school, email, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                closeModal();
+            } catch(e) {
+                err.textContent = e.code === 'auth/email-already-in-use' ? 'This email is already registered. Please login.' :
+                                  e.code === 'auth/weak-password' ? 'Password must be at least 6 characters.' :
+                                  'Registration failed: ' + e.message;
+                err.classList.remove('hidden');
+            }
+            btn.textContent = 'Create My Account';
+            btn.disabled = false;
+        }
+
+        // ── Student Logout ──
+        function studentLogout() {
+            if (confirm('Log out from Sahasra?')) auth.signOut();
+        }
+
+        // ── Load papers + questions from Firestore on startup ──
+        async function loadFromFirebase() {
+            try {
+                // Load published papers
+                const papersSnap = await db.collection('papers').get();
+                publishedPapers = [];
+                papersSnap.forEach(doc => {
+                    const d = doc.data();
+                    publishedPapers.push({ ...d, id: doc.id, publishedAt: d.publishedAt ? d.publishedAt.toDate() : new Date() });
+                });
+                // Load questions into QUIZ_DATA (only published-paper questions, not built-in samples)
+                const qSnap = await db.collection('questions').get();
+                // Remove any previously loaded Firebase questions (keep built-in samples)
+                QUIZ_DATA = QUIZ_DATA.filter(q => !q._fromFirebase);
+                qSnap.forEach(doc => {
+                    QUIZ_DATA.push({ ...doc.data(), _fromFirebase: true });
+                });
+                // Load submissions count per paper
+                const subSnap = await db.collection('submissions').get();
+                studentSubmissions = [];
+                subSnap.forEach(doc => {
+                    const d = doc.data();
+                    studentSubmissions.push({ ...d, submittedAt: d.submittedAt ? d.submittedAt.toDate() : new Date() });
+                });
+                // Update admin stats if open
+                const tq = document.getElementById('admin-total-q');
+                const tp = document.getElementById('admin-total-papers');
+                const ta = document.getElementById('admin-total-attempts');
+                const pc = document.getElementById('published-count');
+                if (tq) tq.textContent = QUIZ_DATA.length;
+                if (tp) tp.textContent = publishedPapers.length;
+                if (ta) ta.textContent = studentSubmissions.length;
+                if (pc) pc.textContent = publishedPapers.length;
+                renderPublishedPapers();
+            } catch(e) {
+                console.warn('Firebase load error:', e.message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadFromFirebase);
+
+
+        // --- QUIZ DATABASE (tagged with grade & subject) ---
+        let QUIZ_DATA = [
+            { grade: "Grade 6",  subject: "Mathematics", stream: null, q: "What is the value of 3² + 4²?", a: ["14","25","7","49"], c: 1, e: "3²=9, 4²=16, 9+16=25." },
+            { grade: "Grade 6",  subject: "Science",     stream: null, q: "Which planet is closest to the Sun?", a: ["Venus","Earth","Mercury","Mars"], c: 2, e: "Mercury is the closest planet to the Sun." },
+            { grade: "Grade 7",  subject: "Mathematics", stream: null, q: "What is 15% of 200?", a: ["20","25","30","35"], c: 2, e: "15/100 × 200 = 30." },
+            { grade: "Grade 7",  subject: "Science",     stream: null, q: "Which gas do plants absorb during photosynthesis?", a: ["Oxygen","Nitrogen","Carbon Dioxide","Hydrogen"], c: 2, e: "Plants absorb CO₂ and release O₂ during photosynthesis." },
+            { grade: "Grade 8",  subject: "Mathematics", stream: null, q: "Solve: 2x + 5 = 13. What is x?", a: ["3","4","5","6"], c: 1, e: "2x=8, x=4." },
+            { grade: "Grade 8",  subject: "Science",     stream: null, q: "What is the chemical symbol for water?", a: ["HO","H₂O","O₂H","H₃O"], c: 1, e: "Water is H₂O — two hydrogen atoms bonded to one oxygen." },
+            { grade: "Grade 9",  subject: "Mathematics", stream: null, q: "What is the area of a circle with radius 7 cm? (π ≈ 3.14)", a: ["43.96 cm²","153.86 cm²","49 cm²","21.98 cm²"], c: 1, e: "Area = πr² = 3.14 × 49 = 153.86 cm²." },
+            { grade: "Grade 9",  subject: "Science",     stream: null, q: "Newton's First Law is also known as:", a: ["Law of Gravity","Law of Inertia","Law of Acceleration","Law of Action-Reaction"], c: 1, e: "Newton's First Law describes inertia — a body at rest stays at rest unless acted upon." },
+            { grade: "Grade 10", subject: "Mathematics", stream: null, q: "What is sin 30°?", a: ["0","0.5","1","√3/2"], c: 1, e: "sin 30° = 1/2 = 0.5." },
+            { grade: "Grade 10", subject: "Science",     stream: null, q: "Which element has atomic number 6?", a: ["Oxygen","Nitrogen","Carbon","Helium"], c: 2, e: "Carbon has atomic number 6." },
+            { grade: "Grade 11", subject: "Mathematics", stream: null, q: "If f(x) = x² − 4, what is f(3)?", a: ["1","5","9","13"], c: 1, e: "f(3) = 9 − 4 = 5." },
+            { grade: "Grade 11", subject: "Science",     stream: null, q: "What is the speed of light in a vacuum?", a: ["3×10⁸ m/s","3×10⁶ m/s","3×10¹⁰ m/s","3×10⁴ m/s"], c: 0, e: "Speed of light c ≈ 3×10⁸ m/s." },
+            { grade: "Grade 11", subject: "ICT",         stream: null, q: "Which of the following is a primary memory?", a: ["HDD","RAM","SSD","Flash Drive"], c: 1, e: "RAM is volatile primary memory used by the CPU." },
+            { grade: "Grade 11", subject: "ICT",         stream: null, q: "What does HTML stand for?", a: ["Hyper Text Markup Language","High Tech Modern Language","Hyper Transfer Main Line","Home Tool Markup Language"], c: 0, e: "HTML = Hyper Text Markup Language, the standard for web pages." },
+            { grade: "Grade 11", subject: "ICT",         stream: null, q: "Which protocol is used for secure web pages?", a: ["HTTP","FTP","SMTP","HTTPS"], c: 3, e: "HTTPS encrypts communication between browser and server." },
+            { grade: "Grade 11", subject: "ICT",         stream: null, q: "In binary, what is the decimal value of '1010'?", a: ["8","10","12","14"], c: 1, e: "(1×8)+(0×4)+(1×2)+(0×1) = 10." },
+            { grade: "Grade 11", subject: "ICT",         stream: null, q: "Which SQL command retrieves data from a table?", a: ["GET","EXTRACT","SELECT","PULL"], c: 2, e: "SELECT is the standard SQL retrieval command." },
+            { grade: "Grade 12", subject: "Combined Mathematics", stream: "Physical Science (Maths)", q: "Differentiate y = 3x³ with respect to x.", a: ["3x²","9x²","6x","9x³"], c: 1, e: "d/dx(3x³) = 9x²." },
+            { grade: "Grade 12", subject: "Physics",     stream: "Physical Science (Maths)", q: "What is the SI unit of electric current?", a: ["Volt","Watt","Ampere","Ohm"], c: 2, e: "Ampere (A) is the SI unit of electric current." },
+            { grade: "Grade 12", subject: "Chemistry",   stream: "Physical Science (Maths)", q: "What is the molar mass of NaCl?", a: ["48 g/mol","58.5 g/mol","74 g/mol","35.5 g/mol"], c: 1, e: "Na=23 + Cl=35.5 → 58.5 g/mol." },
+            { grade: "Grade 12", subject: "Biology",     stream: "Biological Science", q: "What is the powerhouse of the cell?", a: ["Nucleus","Ribosome","Mitochondria","Chloroplast"], c: 2, e: "Mitochondria produce ATP — the cell's energy currency." },
+            { grade: "Grade 12", subject: "Accounting",  stream: "Commerce", q: "The accounting equation is:", a: ["Assets = Liabilities − Equity","Assets = Liabilities + Equity","Liabilities = Assets + Equity","Equity = Assets + Liabilities"], c: 1, e: "Assets = Liabilities + Owner's Equity is the fundamental accounting equation." },
+            { grade: "Grade 12", subject: "Economics",   stream: "Commerce", q: "What does GDP stand for?", a: ["Gross Domestic Product","General Domestic Production","Gross Development Plan","General Development Product"], c: 0, e: "GDP = Gross Domestic Product, total value of goods and services produced." },
+            { grade: "Grade 13", subject: "Combined Mathematics", stream: "Physical Science (Maths)", q: "Integrate ∫2x dx.", a: ["x","2x²","x² + C","2 + C"], c: 2, e: "∫2x dx = x² + C." },
+            { grade: "Grade 13", subject: "Physics",     stream: "Physical Science (Maths)", q: "Which law states F = ma?", a: ["Newton's 1st Law","Newton's 2nd Law","Newton's 3rd Law","Ohm's Law"], c: 1, e: "Newton's Second Law: Force = mass × acceleration." },
+        ];
+
+        // Current filtered questions for the active quiz session
+        // ============================================================
+        //  NAVIGATION
+        // ============================================================
+        function navTo(viewId) {
+            const views = ['home','stream','subjects','papers','quiz','results','leaderboard','about','admin'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if (el) el.classList.add('hidden');
+            });
+            const target = document.getElementById(`view-${viewId}`);
+            if (target) {
+                target.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // ============================================================
+        //  GRADE → STREAM → SUBJECT → PAPER FLOW
+        // ============================================================
+        function selectGrade(grade) {
+            state.grade = grade;
+            state.stream = null;
+            state.subject = null;
+            state.selectedTerm = null;
+            state.activePaperId = null;
+            state.activePaperName = null;
+            state.subView = 'subjects';
+            if (grade === 12 || grade === 13) {
+                document.getElementById('stream-grade-display').textContent = grade;
+                navTo('stream');
+            } else {
+                setupSubjectView();
+            }
+        }
+
+        function selectStream(streamName) {
+            state.stream = streamName;
+            setupSubjectView();
+        }
+
+        function setGridCols(mode) {
+            const grid = document.getElementById('subjects-grid');
+            if (!grid) return;
+            const cls = {
+                subjects: 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6',
+                years:    'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6',
+                terms:    'grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto w-full',
+                papers:   'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6',
+            };
+            grid.className = cls[mode] || cls.subjects;
+        }
+
+        function setupSubjectView() {
+            const metaStr = state.stream
+                ? `Grade ${state.grade} • ${state.stream} Stream`
+                : `Grade ${state.grade} General Education`;
+            document.getElementById('subject-meta-subtitle').textContent = metaStr;
+            document.querySelector('#view-subjects h2').textContent = 'Select Subject';
+            state.subView = 'subjects';
+            setGridCols('subjects');
+            updateSubViewBackLabel();
+            renderSubjects();
+            navTo('subjects');
+        }
+
+        function renderSubjects() {
+            const grid = document.getElementById('subjects-grid');
+            grid.innerHTML = '';
+            let subjects = [];
+
+            if (state.grade <= 9) {
+                subjects = [
+                    {name:"Mathematics",icon:"📐",color:"blue"},
+                    {name:"Science",icon:"🔬",color:"emerald"},
+                    {name:"English",icon:"📚",color:"amber"},
+                    {name:"Sinhala",icon:"📝",color:"purple"},
+                    {name:"History",icon:"🏛️",color:"rose"},
+                    {name:"Geography",icon:"🌍",color:"blue"}
+                ];
+            } else if (state.grade <= 11) {
+                subjects = [
+                    {name:"Mathematics",icon:"📐",color:"blue"},
+                    {name:"Science",icon:"🔬",color:"emerald"},
+                    {name:"English",icon:"📚",color:"amber"},
+                    {name:"Sinhala",icon:"📝",color:"purple"},
+                    {name:"History",icon:"🏛️",color:"rose"},
+                    {name:"ICT",icon:"💻",color:"emerald"},
+                    {name:"Commerce",icon:"📊",color:"amber"},
+                    {name:"Geography",icon:"🌍",color:"blue"}
+                ];
+            } else if (state.stream && state.stream.includes('Maths')) {
+                subjects = [{name:"Combined Mathematics",icon:"📐",color:"blue"},{name:"Physics",icon:"⚡",color:"emerald"},{name:"Chemistry",icon:"🧪",color:"rose"},{name:"ICT",icon:"💻",color:"amber"}];
+            } else if (state.stream && state.stream.includes('Bio')) {
+                subjects = [{name:"Biology",icon:"🧬",color:"emerald"},{name:"Physics",icon:"⚡",color:"blue"},{name:"Chemistry",icon:"🧪",color:"rose"},{name:"Agricultural Science",icon:"🌱",color:"amber"}];
+            } else if (state.stream && state.stream.includes('Commerce')) {
+                subjects = [{name:"Accounting",icon:"📒",color:"blue"},{name:"Business Studies",icon:"🏢",color:"emerald"},{name:"Economics",icon:"📈",color:"amber"},{name:"ICT",icon:"💻",color:"purple"}];
+            } else if (state.stream && state.stream.includes('Arts')) {
+                subjects = [{name:"Sinhala",icon:"📝",color:"purple"},{name:"History",icon:"🏛️",color:"rose"},{name:"Logic",icon:"🧠",color:"blue"},{name:"Geography",icon:"🌍",color:"emerald"}];
+            } else {
+                subjects = [{name:"Science for Tech",icon:"⚙️",color:"blue"},{name:"Engineering Tech",icon:"🔧",color:"emerald"},{name:"Bio Systems Tech",icon:"🔬",color:"rose"},{name:"ICT",icon:"💻",color:"amber"}];
+            }
+
+            subjects.forEach(s => {
+                grid.innerHTML += `
+                    <div onclick="selectSubject('${s.name}')" class="hover-card p-8 rounded-3xl text-center cursor-pointer group">
+                        <div class="w-16 h-16 mx-auto rounded-2xl bg-${s.color}-50 text-3xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">${s.icon}</div>
+                        <h3 class="text-lg font-bold text-slate-800">${s.name}</h3>
+                    </div>`;
+            });
+        }
+
+        function selectSubject(subjectName) {
+            state.subject = subjectName;
+            setupPaperView();
+        }
+
+        function goBackFromSubjects() {
+            // Smart back navigation based on which sub-screen is active
+            switch (state.subView) {
+                case 'subjects':
+                    if (state.grade === 12 || state.grade === 13) navTo('stream');
+                    else navTo('home');
+                    break;
+                case 'years':
+                    // Go back to subject list
+                    state.subView = 'subjects';
+                    setupSubjectView();
+                    break;
+                case 'terms':
+                    // Go back to year selection
+                    state.subView = 'years';
+                    showYearSelection();
+                    break;
+                case 'papers':
+                    // Go back to term selection (if School Term Papers or Provincial Papers) or year selection
+                    if (state.paperType === 'School Term Papers' || state.paperType === 'Provincial Papers') {
+                        state.subView = 'terms';
+                        showTermSelection();
+                    } else {
+                        state.subView = 'years';
+                        showYearSelection();
+                    }
+                    break;
+                default:
+                    navTo('home');
+            }
+        }
+
+        // Update the back-button label based on sub-view
+        function updateSubViewBackLabel() {
+            const btn = document.getElementById('subjects-back-btn');
+            if (!btn) return;
+            const labels = {
+                subjects: state.grade === 12 || state.grade === 13 ? 'Back to Streams' : 'Back to Grades',
+                years:    'Back to Subjects',
+                terms:    'Back to Years',
+                papers:   (state.paperType === 'School Term Papers' || state.paperType === 'Provincial Papers') ? 'Back to Terms' : 'Back to Years',
+            };
+            // Only update the text node, preserve the SVG icon
+            const textNode = [...btn.childNodes].find(n => n.nodeType === 3 && n.textContent.trim());
+            if (textNode) {
+                textNode.textContent = ' ' + (labels[state.subView] || 'Back');
+            } else {
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg> ${labels[state.subView] || 'Back'}`;
+            }
+        }
+
+        function setupPaperView() {
+            const metaStr = state.stream
+                ? `Grade ${state.grade} • ${state.stream} • ${state.subject}`
+                : `Grade ${state.grade} • ${state.subject}`;
+            document.getElementById('paper-meta-subtitle').textContent = metaStr;
+
+            // Hide "Past Papers" card for grades 6-10
+            const paperGrid = document.querySelector('#view-papers .grid');
+            if (paperGrid) {
+                const pastPaperCard = paperGrid.firstElementChild;
+                if (pastPaperCard) {
+                    pastPaperCard.style.display = (state.grade >= 6 && state.grade <= 10) ? 'none' : '';
+                }
+            }
+            navTo('papers');
+        }
+
+        function goBackFromPapers() { 
+            state.subView = 'subjects';
+            setupSubjectView();
+        }
+
+        function selectPaper(type) {
+            state.paperType = type;
+            if (state.grade >= 6 && state.grade <= 10 && type === 'National Past Papers') {
+                alert("National Past Papers are only available for O/L and A/L grades.");
+                return;
+            }
+            showYearSelection();
+        }
+
+        function showYearSelection() {
+            const grid     = document.getElementById('subjects-grid');
+            const titleEl  = document.querySelector('#view-subjects h2');
+            const subtitle = document.getElementById('subject-meta-subtitle');
+            titleEl.textContent  = "Select Examination Year";
+            subtitle.textContent = `${state.subject} — ${state.paperType}`;
+            grid.innerHTML = '';
+            state.subView = 'years';
+            setGridCols('years');
+            updateSubViewBackLabel();
+            [2023,2022,2021,2020,2019,2018,2017,2016,2015].forEach(year => {
+                grid.innerHTML += `
+                    <div onclick="confirmYear(${year})" class="hover-card p-8 rounded-3xl text-center cursor-pointer group border-2 border-transparent hover:border-blue-500">
+                        <div class="text-2xl font-black text-blue-600 mb-2">${year}</div>
+                        <h3 class="text-sm font-bold text-slate-500 uppercase">${state.paperType === 'School Term Papers' ? 'Term Tests' : 'Past Paper'}</h3>
+                    </div>`;
+            });
+            navTo('subjects');
+        }
+
+        function confirmYear(year) {
+            state.selectedYear = year;
+            // School Term Papers & Provincial Papers → ask which term first
+            if (state.paperType === 'School Term Papers' || state.paperType === 'Provincial Papers') {
+                showTermSelection();
+            } else {
+                // For other paper types, go straight to the paper list
+                showPaperList();
+            }
+        }
+
+        // ── STEP: Term Selection (School Term Papers & Provincial Papers) ──
+        function showTermSelection() {
+            const grid    = document.getElementById('subjects-grid');
+            const titleEl = document.querySelector('#view-subjects h2');
+            const subtitle = document.getElementById('subject-meta-subtitle');
+            titleEl.textContent  = "Select Term";
+            subtitle.textContent = `${state.subject} — ${state.paperType} — ${state.selectedYear}`;
+            grid.innerHTML = '';
+            state.subView = 'terms';
+            updateSubViewBackLabel();
+
+            const terms = [
+                { key: 'First Term',  label: 'First Term Test',  icon: '📝', color: 'blue',    num: '01' },
+                { key: 'Second Term', label: 'Second Term Test', icon: '📋', color: 'emerald',  num: '02' },
+                { key: 'Third Term',  label: 'Third Term Test',  icon: '📄', color: 'amber',    num: '03' },
+            ];
+
+            terms.forEach(t => {
+                grid.innerHTML += `
+                    <div onclick="selectTerm('${t.key}')"
+                         class="hover-card p-8 rounded-3xl text-center cursor-pointer group border-2 border-transparent hover:border-${t.color}-500">
+                        <div class="w-16 h-16 mx-auto rounded-2xl bg-${t.color}-50 text-${t.color}-600 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">${t.icon}</div>
+                        <h3 class="text-lg font-bold text-slate-800">${t.label}</h3>
+                        <p class="text-xs text-slate-400 font-semibold mt-1 uppercase tracking-wide">${state.selectedYear} • Term ${t.num}</p>
+                    </div>`;
+            });
+            navTo('subjects');
+        }
+
+        function selectTerm(termKey) {
+            state.selectedTerm = termKey;
+            showPaperList();
+        }
+
+        // ── STEP: Individual Paper List ──
+        function showPaperList() {
+            // Guard: need grade and subject at minimum
+            if (!state.grade || !state.subject) { navTo('home'); return; }
+
+            // Collect matching published papers
+            const gradeStr = `Grade ${state.grade}`;
+            const papers = publishedPapers.filter(p =>
+                p.grade    === gradeStr          &&
+                p.subject  === state.subject     &&
+                p.paperType === state.paperType  &&
+                String(p.year) === String(state.selectedYear) &&
+                (state.selectedTerm ? p.term === state.selectedTerm : true)
+            );
+
+            const grid    = document.getElementById('subjects-grid');
+            const titleEl = document.querySelector('#view-subjects h2');
+            const subtitle = document.getElementById('subject-meta-subtitle');
+
+            const termLabel = state.selectedTerm ? ` — ${state.selectedTerm} Test` : '';
+            titleEl.textContent  = `Available Papers`;
+            subtitle.textContent = `${state.subject} — ${state.paperType} — ${state.selectedYear}${termLabel}`;
+            grid.innerHTML = '';
+            state.subView = 'papers';
+            updateSubViewBackLabel();
+
+            if (papers.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-16">
+                        <div class="w-20 h-20 mx-auto rounded-full bg-slate-100 flex items-center justify-center mb-4 text-4xl">📭</div>
+                        <h3 class="text-xl font-extrabold text-slate-700 mb-2">No Papers Available Yet</h3>
+                        <p class="text-slate-400 text-sm">The admin hasn't published any papers for this selection.<br>Check back soon or try a different term/year.</p>
+                    </div>`;
+                navTo('subjects');
+                return;
+            }
+
+            papers.forEach((p, idx) => {
+                const subs = studentSubmissions.filter(s => s.paperId === p.id);
+                const termColors = { 'First Term':'blue', 'Second Term':'emerald', 'Third Term':'amber' };
+                const tc = termColors[p.term] || 'slate';
+                grid.innerHTML += `
+                    <div onclick="startPaperById('${p.id}')"
+                         class="hover-card p-7 rounded-3xl cursor-pointer group border-2 border-transparent hover:border-blue-500 flex flex-col gap-3">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-black group-hover:scale-110 transition-transform shrink-0">${idx + 1}</div>
+                            ${p.term ? `<span class="text-[10px] font-black uppercase px-2 py-1 rounded-full bg-${tc}-100 text-${tc}-700 tracking-wide">${p.term}</span>` : ''}
+                        </div>
+                        <div>
+                            <h3 class="text-base font-extrabold text-slate-900 leading-snug">${p.paperName}</h3>
+                            <p class="text-xs text-slate-400 font-semibold mt-1">${p.grade} • ${p.subject} • ${p.year || ''}</p>
+                        </div>
+                        <div class="flex items-center gap-3 mt-auto pt-2 border-t border-slate-100 flex-wrap">
+                            <span class="text-xs font-bold text-slate-500">📝 ${p.questionCount} Questions</span>
+                            <span class="text-xs font-bold text-purple-600">👥 ${subs.length} Attempts</span>
+                        </div>
+                        <div class="w-full py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl text-center group-hover:bg-blue-700 transition mt-1">
+                            Start Paper →
+                        </div>
+                    </div>`;
+            });
+            navTo('subjects');
+        }
+
+        // ── Start a specific published paper by its ID ──
+        function startPaperById(paperId) {
+            const paper = publishedPapers.find(p => p.id === paperId);
+            if (!paper) { alert('Paper not found.'); return; }
+            state.activePaperId = paperId;
+            state.activePaperName = paper.paperName;
+            state.selectedTerm = paper.term || null;
+            startQuiz();
+        }
+
+        function goBackFromQuiz() {
+            clearInterval(state.timerInterval);
+            if (confirm('Leave this paper? Your current progress will be lost.')) {
+                showPaperList();
+            }
+        }
+
+        function retryCurrentPaper() {
+            if (state.activePaperId) {
+                startPaperById(state.activePaperId);
+            } else {
+                startQuiz();
+            }
+        }
+
+        // ============================================================
+        //  QUIZ ENGINE
+        // ============================================================
+        function startQuiz() {
+            const gradeStr = `Grade ${state.grade}`;
+
+            if (state.activePaperId) {
+                // Filter questions that belong to this specific paper (tagged with paperId)
+                currentSessionQuestions = QUIZ_DATA.filter(q => q.paperId === state.activePaperId);
+                // Fallback: match by grade+subject if paperId tags aren't set (pre-loaded sample data)
+                if (currentSessionQuestions.length === 0) {
+                    currentSessionQuestions = QUIZ_DATA.filter(q =>
+                        q.grade === gradeStr && q.subject === state.subject
+                    );
+                }
+            } else {
+                currentSessionQuestions = QUIZ_DATA.filter(q =>
+                    q.grade === gradeStr && q.subject === state.subject
+                );
+            }
+
+            if (currentSessionQuestions.length === 0) {
+                alert(`No questions available for Grade ${state.grade} — ${state.subject} yet.\nPlease try another subject, or add questions via Admin.`);
+                navTo('home');
+                return;
+            }
+
+            state.currentIndex = 0;
+            state.userAnswers  = new Array(currentSessionQuestions.length).fill(undefined);
+            state.timer        = 0;
+            clearInterval(state.timerInterval);
+
+            // Update quiz header meta
+            const termLabel = state.selectedTerm ? ` • ${state.selectedTerm} Test` : '';
+            const metaStr = state.stream
+                ? `Grade ${state.grade} • ${state.stream} • ${state.subject} • ${state.paperType} • ${state.selectedYear}${termLabel}`
+                : `Grade ${state.grade} • ${state.subject} • ${state.paperType} • ${state.selectedYear}${termLabel}`;
+            const quizTitle = document.getElementById('quiz-title');
+            const quizMeta  = document.getElementById('quiz-meta');
+            if (quizTitle) quizTitle.textContent = state.activePaperName || (state.subject + ' Paper');
+            if (quizMeta)  quizMeta.textContent  = metaStr;
+
+            state.timerInterval = setInterval(() => {
+                state.timer++;
+                const m = Math.floor(state.timer / 60);
+                const s = state.timer % 60;
+                const timerEl = document.getElementById('timer');
+                if (timerEl) timerEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            }, 1000);
+
+            navTo('quiz');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q       = currentSessionQuestions[state.currentIndex];
+            const total   = currentSessionQuestions.length;
+            const nextBtn = document.getElementById('next-btn');
+            const prevBtn = document.getElementById('prev-btn');
+
+            document.getElementById('q-counter').textContent   = `Question ${state.currentIndex + 1} of ${total}`;
+            document.getElementById('question-text').textContent = q.q;
+            document.getElementById('progress-fill').style.width = `${((state.currentIndex + 1) / total) * 100}%`;
+
+            // Show/hide question image
+            const imgWrap = document.getElementById('question-image-wrap');
+            const imgEl   = document.getElementById('question-image');
+            if (q.img) {
+                imgEl.src = q.img;
+                imgWrap.classList.remove('hidden');
+            } else {
+                imgWrap.classList.add('hidden');
+                imgEl.src = '';
+            }
+
+            prevBtn.classList.toggle('hidden', state.currentIndex === 0);
+            nextBtn.textContent = (state.currentIndex === total - 1) ? "Submit Final Paper" : "Next Question";
+            nextBtn.disabled    = (state.userAnswers[state.currentIndex] === undefined);
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            q.a.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                const isSelected = state.userAnswers[state.currentIndex] === i;
+                btn.className = `option-btn w-full p-5 rounded-2xl text-left font-bold text-slate-700 bg-white flex items-center gap-4 hover:bg-slate-50 cursor-pointer ${isSelected ? 'selected' : ''}`;
+                btn.innerHTML = `
+                    <div class="w-10 h-10 shrink-0 rounded-xl bg-slate-100 flex items-center justify-center text-sm text-slate-400 font-black">${String.fromCharCode(65+i)}</div>
+                    <span class="leading-snug">${opt}</span>`;
+                btn.onclick = () => {
+                    document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    state.userAnswers[state.currentIndex] = i;
+                    nextBtn.disabled = false;
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function nextQuestion() {
+            if (state.currentIndex < currentSessionQuestions.length - 1) {
+                state.currentIndex++;
+                renderQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function prevQuestion() {
+            if (state.currentIndex > 0) {
+                state.currentIndex--;
+                renderQuestion();
+            }
+        }
+
+        function finishQuiz() {
+            clearInterval(state.timerInterval);
+            navTo('results');
+
+            let correctCount = 0;
+            const list = document.getElementById('mistake-list');
+            list.innerHTML = '';
+
+            currentSessionQuestions.forEach((q, i) => {
+                const isCorrect = state.userAnswers[i] === q.c;
+                if (isCorrect) correctCount++;
+                const item = document.createElement('div');
+                item.className = `bg-white p-6 rounded-2xl border border-slate-100 border-l-8 ${isCorrect ? 'border-l-emerald-500' : 'border-l-red-500'} shadow-sm`;
+                item.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <p class="font-bold text-slate-800 text-lg">${i+1}. ${q.q}</p>
+                        <span class="text-[10px] font-black uppercase px-3 py-1 rounded-full ${isCorrect ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}">${isCorrect ? 'Correct' : 'Incorrect'}</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                        <div class="text-sm p-4 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="font-black text-slate-400 text-[10px] uppercase block mb-1">Your Answer</span>
+                            ${q.a[state.userAnswers[i]] !== undefined ? q.a[state.userAnswers[i]] : '<span class="text-slate-400 italic">No answer selected</span>'}
+                        </div>
+                        <div class="text-sm p-4 bg-emerald-50 text-emerald-800 rounded-xl border border-emerald-100">
+                            <span class="font-black text-emerald-400 text-[10px] uppercase block mb-1">Correct Answer</span>
+                            ${q.a[q.c]}
+                        </div>
+                    </div>
+                    <div class="mt-4 p-4 bg-blue-50 rounded-xl text-sm text-blue-900 border border-blue-100 flex gap-3 items-start">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="shrink-0 mt-0.5 text-blue-500" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        <p><span class="font-bold">Explanation:</span> ${q.e}</p>
+                    </div>`;
+                list.appendChild(item);
+            });
+
+            const percentage = Math.round((correctCount / currentSessionQuestions.length) * 100);
+            document.getElementById('res-score').textContent   = `${percentage}%`;
+            document.getElementById('res-correct').textContent = `${correctCount}/${currentSessionQuestions.length}`;
+
+            const termLabel = state.selectedTerm ? ` • ${state.selectedTerm}` : '';
+            const yearLabel = state.selectedYear ? ` • ${state.selectedYear}` : '';
+            const metaStr = state.stream
+                ? `Grade ${state.grade} • ${state.stream} • ${state.subject} • ${state.paperType}${termLabel}${yearLabel}`
+                : `Grade ${state.grade} • ${state.subject} • ${state.paperType}${termLabel}${yearLabel}`;
+            document.getElementById('res-paper-info').textContent = (state.activePaperName ? state.activePaperName + '  —  ' : '') + metaStr;
+
+            const m = Math.floor(state.timer / 60);
+            const s = state.timer % 60;
+            document.getElementById('res-time').textContent = `${m}:${String(s).padStart(2,'0')}`;
+
+            let rank = "F", rankColor = "text-red-500";
+            if (percentage >= 75)      { rank = "A"; rankColor = "text-emerald-500"; }
+            else if (percentage >= 65) { rank = "B"; rankColor = "text-blue-500"; }
+            else if (percentage >= 50) { rank = "C"; rankColor = "text-amber-500"; }
+            else if (percentage >= 35) { rank = "S"; rankColor = "text-orange-500"; }
+            const rankEl = document.getElementById('res-rank');
+            rankEl.textContent = rank;
+            rankEl.className   = `text-4xl font-black ${rankColor}`;
+
+            // Record this submission locally
+            const paperKey = state.activePaperId || `${state.grade}|${state.subject}|${state.paperType}|${state.selectedYear}`;
+            const submission = {
+                paperId:    paperKey,
+                paperName:  state.activePaperName || state.subject + ' Paper',
+                grade:      state.grade,
+                subject:    state.subject,
+                paperType:  state.paperType,
+                term:       state.selectedTerm,
+                year:       state.selectedYear,
+                score:      percentage,
+                correct:    correctCount,
+                total:      currentSessionQuestions.length,
+                timeSecs:   state.timer,
+                rank:       rank,
+                submittedAt: new Date()
+            };
+            if (currentStudent) {
+                submission.studentId    = currentStudent.uid;
+                submission.studentName  = currentStudent.name;
+                submission.studentEmail = currentStudent.email;
+                submission.studentGrade = currentStudent.grade;
+                submission.studentSchool= currentStudent.school;
+            }
+            studentSubmissions.push(submission);
+
+            // Save to Firebase Firestore (non-blocking)
+            if (currentStudent) {
+                db.collection('submissions').add({
+                    ...submission,
+                    submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }).catch(e => console.warn('Submission save failed:', e.message));
+            }
+
+            // Refresh paper list attempt counts if visible
+            if (!document.getElementById('view-subjects').classList.contains('hidden')) {
+                showPaperList();
+            }
+            // Keep admin stats live if admin panel is open
+            const attemptsEl = document.getElementById('admin-total-attempts');
+            if (attemptsEl) attemptsEl.textContent = studentSubmissions.length;
+        }
+
+        // ============================================================
+        //  MODAL
+        // ============================================================
+        function openModal(mode = 'login') {
+            switchModalMode(mode);
+            document.getElementById('auth-modal').classList.remove('hidden');
+        }
+        function closeModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+        function switchModalMode(mode) {
+            ['form-login','form-register','form-admin'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            const icon     = document.getElementById('modal-icon');
+            const title    = document.getElementById('modal-title');
+            const subtitle = document.getElementById('modal-subtitle');
+            if (mode === 'login') {
+                document.getElementById('form-login').classList.remove('hidden');
+                icon.className = "w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold mx-auto mb-4";
+                icon.innerHTML = "S";
+                title.textContent = "Student Login";
+                if (subtitle) subtitle.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> 256-bit Encrypted Connection';
+            } else if (mode === 'register') {
+                document.getElementById('form-register').classList.remove('hidden');
+                icon.className = "w-12 h-12 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold mx-auto mb-4";
+                icon.innerHTML = "+";
+                title.textContent = "Create Account";
+                if (subtitle) subtitle.textContent = "Join 10,000+ students on Sahasra";
+            } else if (mode === 'admin') {
+                document.getElementById('form-admin').classList.remove('hidden');
+                icon.className = "w-12 h-12 rounded-xl bg-slate-900 flex items-center justify-center text-amber-400 font-bold mx-auto mb-4";
+                icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
+                title.textContent = "Admin Secure Access";
+                if (subtitle) subtitle.textContent = "Authorised personnel only";
+            }
+        }
+
+        // ============================================================
+        //  ADMIN WIZARD
+        // ============================================================
+
+
+
+        function wizUpdateStream() {
+            const grade = document.getElementById('wiz-grade').value;
+            const wrap  = document.getElementById('wiz-stream-wrap');
+            wrap.classList.toggle('hidden', !(grade === 'Grade 12' || grade === 'Grade 13'));
+        }
+
+        function wizUpdateSubject() {
+            const grade   = document.getElementById('wiz-grade').value;
+            const sel     = document.getElementById('wiz-subject');
+            const gradeNum = grade.replace('Grade ', '');
+            let key = gradeNum;
+
+            if (grade === 'Grade 12' || grade === 'Grade 13') {
+                key = document.getElementById('wiz-stream').value;
+            }
+
+            const subjects = SUBJECTS_BY_LEVEL[key] || SUBJECTS_BY_LEVEL[gradeNum] || [];
+            sel.innerHTML = subjects.length
+                ? subjects.map(s => `<option value="${s}">${s}</option>`).join('')
+                : '<option value="">— No subjects found —</option>';
+        }
+
+        function wizToggleTerm() {
+            const type = document.getElementById('wiz-paper-type').value;
+            const isRequired = (type === 'School Term Papers' || type === 'Provincial Papers');
+            const star   = document.getElementById('wiz-term-required-star');
+            const badge  = document.getElementById('wiz-term-optional-badge');
+            if (star)  star.classList.toggle('hidden', !isRequired);
+            if (badge) badge.classList.toggle('hidden', isRequired);
+        }
+
+        function wizGoStep(n) {
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`wiz-step-${i}`).classList.toggle('hidden', i !== n);
+                const bar = document.getElementById(`wiz-bar-${i}`);
+                bar.classList.toggle('bg-blue-600', i <= n);
+                bar.classList.toggle('bg-emerald-500', i < n);
+                bar.classList.toggle('bg-slate-200', i > n);
+            }
+            document.getElementById('wiz-step-label').textContent = `Step ${n} of 4`;
+            wizState.step = n;
+        }
+
+        function wizStep1Next() {
+            const grade     = document.getElementById('wiz-grade').value;
+            const subject   = document.getElementById('wiz-subject').value;
+            const paperType = document.getElementById('wiz-paper-type').value;
+            const year      = document.getElementById('wiz-year').value;
+            const paperName = document.getElementById('wiz-paper-name').value.trim();
+
+            if (!grade || !subject || !paperType || !year || !paperName) {
+                alert('Please fill in all required fields before continuing.');
+                return;
+            }
+
+            // Term (required only for School Term Papers and Provincial Papers)
+            let term = null;
+            if (paperType === 'School Term Papers' || paperType === 'Provincial Papers') {
+                const termEl = document.querySelector('input[name="wiz-term"]:checked');
+                if (!termEl) { alert('Please select a Term (1st, 2nd, or 3rd).'); return; }
+                term = termEl.value;
+            }
+
+            const stream = (grade === 'Grade 12' || grade === 'Grade 13')
+                ? document.getElementById('wiz-stream').value : null;
+
+            wizState.paperMeta = { grade, stream, subject, paperType, year, term, paperName };
+            wizState.questions = [];
+
+            // Update step 2 context label
+            const ctx = [grade, stream, subject, paperType, year, term].filter(Boolean).join(' • ');
+            document.getElementById('wiz-paper-context').textContent = ctx;
+            document.getElementById('wiz-q-count').textContent = '0';
+            document.getElementById('wiz-q-list').innerHTML = '';
+
+            wizGoStep(2);
+        }
+
+        // ── Image upload handler ──
+        function wizHandleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (file.size > 2 * 1024 * 1024) { alert('Image too large — max 2 MB.'); event.target.value = ''; return; }
+            const reader = new FileReader();
+            reader.onload = e => {
+                event.target._b64 = e.target.result; // store base64 on the input element
+                const preview = document.getElementById('wiz-img-preview');
+                const dropZone = document.getElementById('wiz-img-drop-zone');
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                dropZone.classList.add('hidden');
+                document.getElementById('wiz-img-clear-btn').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function wizClearImage() {
+            const inp = document.getElementById('wiz-img-input');
+            inp._b64 = null;
+            inp.value = '';
+            document.getElementById('wiz-img-preview').classList.add('hidden');
+            document.getElementById('wiz-img-preview').src = '';
+            document.getElementById('wiz-img-drop-zone').classList.remove('hidden');
+            document.getElementById('wiz-img-clear-btn').classList.add('hidden');
+        }
+
+        function wizToggleOptionE() {
+            const wrap = document.getElementById('wiz-opt-e-wrap');
+            const btn  = document.getElementById('wiz-toggle-e-btn');
+            const sel  = document.getElementById('wiz-correct');
+            const isHidden = wrap.classList.contains('hidden');
+            if (isHidden) {
+                wrap.classList.remove('hidden');
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg> Remove Option E`;
+                btn.classList.replace('text-purple-600','text-red-500');
+                btn.classList.replace('bg-purple-50','bg-red-50');
+                btn.classList.replace('border-purple-200','border-red-200');
+                // Add Option E to correct answer dropdown
+                if (!sel.querySelector('option[value="4"]')) {
+                    const opt = document.createElement('option');
+                    opt.value = '4'; opt.textContent = '✅ Option E';
+                    sel.appendChild(opt);
+                }
+            } else {
+                wrap.classList.add('hidden');
+                document.getElementById('wiz-opt-4').value = '';
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> Add Option E`;
+                btn.classList.replace('text-red-500','text-purple-600');
+                btn.classList.replace('bg-red-50','bg-purple-50');
+                btn.classList.replace('border-red-200','border-purple-200');
+                // Remove Option E from dropdown
+                const optE = sel.querySelector('option[value="4"]');
+                if (optE) sel.removeChild(optE);
+                if (sel.value === '4') sel.value = '0';
+            }
+        }
+
+        function wizAddQuestion() {
+            const qText = document.getElementById('wiz-q-text').value.trim();
+            const opts  = [0,1,2,3].map(i => document.getElementById(`wiz-opt-${i}`).value.trim());
+            const correct = parseInt(document.getElementById('wiz-correct').value);
+            const expl  = document.getElementById('wiz-explanation').value.trim();
+
+            // Include Option E if visible and filled
+            const optEWrap = document.getElementById('wiz-opt-e-wrap');
+            const optEVal  = document.getElementById('wiz-opt-4').value.trim();
+            if (!optEWrap.classList.contains('hidden') && optEVal) {
+                opts.push(optEVal);
+            }
+
+            if (!qText)               { alert('Please enter the question text.'); return; }
+            if (!opts[0] || !opts[1]) { alert('Please fill in at least Option A and Option B.'); return; }
+
+            // Grab image (base64) if uploaded
+            const imgData = document.getElementById('wiz-img-input')._b64 || null;
+
+            const q = {
+                grade:   wizState.paperMeta.grade,
+                stream:  wizState.paperMeta.stream,
+                subject: wizState.paperMeta.subject,
+                paperType: wizState.paperMeta.paperType,
+                year:    wizState.paperMeta.year,
+                term:    wizState.paperMeta.term,
+                paperName: wizState.paperMeta.paperName,
+                q: qText,
+                a: opts,
+                c: correct,
+                e: expl || 'No explanation provided.',
+                img: imgData || null
+            };
+
+            wizState.questions.push(q);
+
+            // Update counter
+            document.getElementById('wiz-q-count').textContent = wizState.questions.length;
+
+            // Append to mini-list
+            const list = document.getElementById('wiz-q-list');
+            const item = document.createElement('div');
+            const correctLetter = String.fromCharCode(65 + correct);
+            item.className = 'flex items-start gap-3 bg-white border border-slate-200 rounded-xl p-4';
+            item.innerHTML = `
+                <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 text-xs font-black flex items-center justify-center shrink-0 mt-0.5">${wizState.questions.length}</span>
+                <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-slate-800 text-sm truncate">${qText}</p>
+                    <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+                        <p class="text-xs text-emerald-600 font-bold">Answer: ${correctLetter} — ${opts[correct]}</p>
+                        ${opts.length === 5 ? '<span class="text-[10px] font-bold bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded">5 opts</span>' : ''}
+                        ${imgData ? '<span class="text-[10px] font-bold bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded">📷 img</span>' : ''}
+                    </div>
+                </div>
+                <button onclick="wizRemoveQuestion(${wizState.questions.length - 1})" class="text-slate-300 hover:text-red-500 transition shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                </button>`;
+            list.appendChild(item);
+
+            // Clear form for next question
+            document.getElementById('wiz-q-text').value = '';
+            [0,1,2,3].forEach(i => document.getElementById(`wiz-opt-${i}`).value = '');
+            document.getElementById('wiz-opt-4').value = '';
+            document.getElementById('wiz-explanation').value = '';
+            document.getElementById('wiz-correct').value = '0';
+            wizClearImage();
+            // Reset Option E state
+            const eWrap = document.getElementById('wiz-opt-e-wrap');
+            const eBtn  = document.getElementById('wiz-toggle-e-btn');
+            if (!eWrap.classList.contains('hidden')) {
+                eWrap.classList.add('hidden');
+                eBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> Add Option E`;
+                eBtn.classList.replace('text-red-500','text-purple-600');
+                eBtn.classList.replace('bg-red-50','bg-purple-50');
+                eBtn.classList.replace('border-red-200','border-purple-200');
+                const sel = document.getElementById('wiz-correct');
+                const optE = sel.querySelector('option[value="4"]');
+                if (optE) sel.removeChild(optE);
+            }
+            document.getElementById('wiz-q-text').focus();
+        }
+
+        function wizRemoveQuestion(idx) {
+            wizState.questions.splice(idx, 1);
+            document.getElementById('wiz-q-count').textContent = wizState.questions.length;
+            // Re-render list
+            const list = document.getElementById('wiz-q-list');
+            list.innerHTML = '';
+            wizState.questions.forEach((q, i) => {
+                const cl = String.fromCharCode(65 + q.c);
+                const item = document.createElement('div');
+                item.className = 'flex items-start gap-3 bg-white border border-slate-200 rounded-xl p-4';
+                item.innerHTML = `
+                    <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 text-xs font-black flex items-center justify-center shrink-0 mt-0.5">${i+1}</span>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-semibold text-slate-800 text-sm truncate">${q.q}</p>
+                        <p class="text-xs text-emerald-600 font-bold mt-0.5">Answer: ${cl} — ${q.a[q.c]}</p>
+                    </div>
+                    <button onclick="wizRemoveQuestion(${i})" class="text-slate-300 hover:text-red-500 transition shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                    </button>`;
+                list.appendChild(item);
+            });
+        }
+
+        function wizStep2Next() {
+            if (wizState.questions.length === 0) {
+                alert('Please add at least one question before continuing.');
+                return;
+            }
+            wizBuildReview();
+            wizGoStep(3);
+        }
+
+        function wizBuildReview() {
+            const m   = wizState.paperMeta;
+            const qs  = wizState.questions;
+            const rev = document.getElementById('wiz-review-content');
+
+            const metaRow = (label, val) => val
+                ? `<div class="flex justify-between text-sm py-2 border-b border-slate-100"><span class="font-bold text-slate-500">${label}</span><span class="font-bold text-slate-800">${val}</span></div>`
+                : '';
+
+            rev.innerHTML = `
+                <div class="bg-blue-50 border border-blue-100 rounded-2xl p-5 mb-4">
+                    <h5 class="font-extrabold text-blue-900 mb-3 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        Paper Information
+                    </h5>
+                    ${metaRow('Paper Name', m.paperName)}
+                    ${metaRow('Grade', m.grade)}
+                    ${metaRow('Stream', m.stream)}
+                    ${metaRow('Subject', m.subject)}
+                    ${metaRow('Paper Type', m.paperType)}
+                    ${metaRow('Year', m.year)}
+                    ${metaRow('Term', m.term)}
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5">
+                    <h5 class="font-extrabold text-slate-800 mb-3 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        ${qs.length} Question${qs.length !== 1 ? 's' : ''} Ready to Publish
+                    </h5>
+                    <div class="space-y-2 max-h-56 overflow-y-auto">
+                        ${qs.map((q,i) => `
+                            <div class="flex items-start gap-3 bg-white rounded-xl p-3 border border-slate-100">
+                                <span class="w-6 h-6 rounded bg-slate-100 text-slate-500 text-xs font-black flex items-center justify-center shrink-0">${i+1}</span>
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-800">${q.q}</p>
+                                    <p class="text-xs text-emerald-600 font-bold mt-0.5">✅ ${String.fromCharCode(65+q.c)}: ${q.a[q.c]}</p>
+                                </div>
+                            </div>`).join('')}
+                    </div>
+                </div>`;
+        }
+
+        async function wizPublish() {
+            const m  = wizState.paperMeta;
+            const qs = wizState.questions;
+            const publishBtn = document.querySelector('#wiz-step-3 button[onclick="wizPublish()"]');
+            if (publishBtn) { publishBtn.textContent = 'Publishing...'; publishBtn.disabled = true; }
+
+            try {
+                // Save paper doc to Firestore
+                const paperRef = db.collection('papers').doc();
+                const paperId  = paperRef.id;
+                await paperRef.set({
+                    ...m,
+                    id: paperId,
+                    questionCount: qs.length,
+                    publishedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Save each question as a separate Firestore document (batch for speed)
+                const batch = db.batch();
+                qs.forEach(q => {
+                    const qRef = db.collection('questions').doc();
+                    batch.set(qRef, { ...q, paperId, _fromFirebase: true });
+                });
+                await batch.commit();
+
+                // Update local state
+                QUIZ_DATA.push(...qs.map(q => ({ ...q, paperId, _fromFirebase: true })));
+                publishedPapers.unshift({ ...m, id: paperId, questionCount: qs.length, publishedAt: new Date() });
+
+                // Update stats
+                document.getElementById('admin-total-q').textContent        = QUIZ_DATA.length;
+                document.getElementById('admin-total-papers').textContent   = publishedPapers.length;
+                document.getElementById('published-count').textContent      = publishedPapers.length;
+                document.getElementById('admin-total-attempts').textContent = studentSubmissions.length;
+                renderPublishedPapers();
+
+                document.getElementById('wiz-success-msg').textContent =
+                    `"${m.paperName}" (${qs.length} questions) saved to Firebase and published. Students can access it immediately.`;
+                wizGoStep(4);
+            } catch(e) {
+                alert('Failed to publish: ' + e.message + '\nCheck your internet connection and try again.');
+            }
+            if (publishBtn) { publishBtn.textContent = 'Publish Paper to Database'; publishBtn.disabled = false; }
+        }
+
+        function renderPublishedPapers() {
+            const list = document.getElementById('published-papers-list');
+            if (publishedPapers.length === 0) {
+                list.innerHTML = '<p class="text-sm text-slate-400 text-center py-6">No papers published yet.</p>';
+                return;
+            }
+
+            // Group papers: term-based papers grouped under their term, others under "Other"
+            const termOrder = ['First Term', 'Second Term', 'Third Term', null];
+            const groups = {};
+            publishedPapers.slice().reverse().forEach(p => {
+                const key = p.term || '__other__';
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(p);
+            });
+
+            const termLabels = {
+                'First Term':  { label: '1st Term Papers',  color: 'blue',    icon: '📝' },
+                'Second Term': { label: '2nd Term Papers',  color: 'emerald',  icon: '📋' },
+                'Third Term':  { label: '3rd Term Papers',  color: 'amber',    icon: '📄' },
+                '__other__':   { label: 'Other Papers',     color: 'slate',    icon: '📁' },
+            };
+
+            let html = '';
+            [...termOrder, '__other__'].forEach(termKey => {
+                const papers = groups[termKey];
+                if (!papers || papers.length === 0) return;
+                const meta = termLabels[termKey] || termLabels['__other__'];
+                html += `
+                <div class="px-4 pt-3 pb-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-base">${meta.icon}</span>
+                        <span class="text-[11px] font-extrabold uppercase tracking-widest text-${meta.color}-700">${meta.label}</span>
+                        <span class="ml-auto text-[10px] font-bold bg-${meta.color}-100 text-${meta.color}-700 px-2 py-0.5 rounded-full">${papers.length}</span>
+                    </div>
+                </div>`;
+                papers.forEach(p => {
+                    const subs = studentSubmissions.filter(s => s.paperId === p.id);
+                    const avgScore = subs.length ? Math.round(subs.reduce((a,b) => a + b.score, 0) / subs.length) : null;
+                    const termColors = { 'First Term':'blue', 'Second Term':'emerald', 'Third Term':'amber' };
+                    const tc = p.term ? (termColors[p.term] || 'slate') : null;
+                    html += `
+                    <div class="px-5 py-3 hover:bg-slate-50 transition border-b border-slate-100 last:border-0">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="flex-1 min-w-0">
+                                <p class="font-bold text-slate-800 text-sm truncate">${p.paperName}</p>
+                                <div class="flex items-center gap-2 mt-1 flex-wrap">
+                                    <span class="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">${p.grade}</span>
+                                    <span class="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">${p.subject}</span>
+                                    <span class="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">${p.questionCount} Qs</span>
+                                    ${p.year ? `<span class="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">${p.year}</span>` : ''}
+                                    <span class="text-[10px] font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">👥 ${subs.length} done</span>
+                                    ${avgScore !== null ? `<span class="text-[10px] font-bold bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full">avg ${avgScore}%</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <button onclick="viewPaperResults('${p.id}')" title="View Results"
+                                    class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                </button>
+                                <button onclick="deletePaper('${p.id}')" title="Delete Paper"
+                                    class="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 flex items-center justify-center transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+            });
+            list.innerHTML = html;
+        }
+
+        async function deletePaper(paperId) {
+            const paper = publishedPapers.find(p => p.id === paperId);
+            if (!paper) return;
+            if (!confirm(`Delete "${paper.paperName}"?\n\nThis will permanently remove all ${paper.questionCount} questions from Firebase. This cannot be undone.`)) return;
+
+            try {
+                // Delete questions from Firestore (batch)
+                const qSnap = await db.collection('questions').where('paperId','==',paperId).get();
+                const batch = db.batch();
+                qSnap.forEach(doc => batch.delete(doc.ref));
+                batch.delete(db.collection('papers').doc(paperId));
+                await batch.commit();
+            } catch(e) {
+                console.warn('Firestore delete error:', e.message);
+            }
+
+            // Update local state
+            const idx = publishedPapers.findIndex(p => p.id === paperId);
+            if (idx !== -1) publishedPapers.splice(idx, 1);
+            for (let i = QUIZ_DATA.length - 1; i >= 0; i--) {
+                if (QUIZ_DATA[i].paperId === paperId) QUIZ_DATA.splice(i, 1);
+            }
+
+            document.getElementById('admin-total-q').textContent        = QUIZ_DATA.length;
+            document.getElementById('admin-total-papers').textContent   = publishedPapers.length;
+            document.getElementById('published-count').textContent      = publishedPapers.length;
+            document.getElementById('admin-total-attempts').textContent = studentSubmissions.length;
+            renderPublishedPapers();
+        }
+
+        async function viewPaperResults(paperId) {
+            const paper = publishedPapers.find(p => p.id === paperId);
+            if (!paper) return;
+
+            const modal   = document.getElementById('paper-results-modal');
+            const contentEl = document.getElementById('paper-results-content');
+            contentEl.innerHTML = '<p class="text-center text-slate-400 py-8">Loading results from Firebase...</p>';
+            modal.classList.remove('hidden');
+
+            // Load fresh from Firestore so admin sees all submissions live
+            let subs = [];
+            try {
+                const snap = await db.collection('submissions').where('paperId','==',paperId).get();
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    subs.push({ ...d, submittedAt: d.submittedAt ? d.submittedAt.toDate() : new Date() });
+                });
+            } catch(e) {
+                // fallback to local cache
+                subs = studentSubmissions.filter(s => s.paperId === paperId);
+            }
+
+            const avgScore   = subs.length ? Math.round(subs.reduce((a,b) => a + b.score, 0) / subs.length) : 0;
+            const avgTime    = subs.length ? Math.round(subs.reduce((a,b) => a + b.timeSecs, 0) / subs.length) : 0;
+            const highest    = subs.length ? Math.max(...subs.map(s => s.score)) : 0;
+            const rankCounts = {A:0, B:0, C:0, S:0, F:0};
+            subs.forEach(s => { if (rankCounts[s.rank] !== undefined) rankCounts[s.rank]++; });
+            const fmtTime = (sec) => `${Math.floor(sec/60)}m ${sec%60}s`;
+
+            contentEl.innerHTML = `
+                <div class="mb-6">
+                    <h3 class="text-xl font-extrabold text-slate-900">${paper.paperName}</h3>
+                    <p class="text-sm text-slate-500 mt-1">${paper.grade} • ${paper.subject} ${paper.stream ? '• '+paper.stream : ''} ${paper.year ? '• '+paper.year : ''} ${paper.term ? '• '+paper.term : ''}</p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    <div class="bg-blue-50 rounded-2xl p-4 text-center">
+                        <p class="text-2xl font-black text-blue-600">${subs.length}</p>
+                        <p class="text-[10px] font-bold text-blue-400 uppercase mt-1">Students Done</p>
+                    </div>
+                    <div class="bg-emerald-50 rounded-2xl p-4 text-center">
+                        <p class="text-2xl font-black text-emerald-600">${avgScore}%</p>
+                        <p class="text-[10px] font-bold text-emerald-400 uppercase mt-1">Avg Score</p>
+                    </div>
+                    <div class="bg-amber-50 rounded-2xl p-4 text-center">
+                        <p class="text-2xl font-black text-amber-600">${highest}%</p>
+                        <p class="text-[10px] font-bold text-amber-400 uppercase mt-1">Highest Score</p>
+                    </div>
+                    <div class="bg-purple-50 rounded-2xl p-4 text-center">
+                        <p class="text-2xl font-black text-purple-600">${fmtTime(avgTime)}</p>
+                        <p class="text-[10px] font-bold text-purple-400 uppercase mt-1">Avg Time</p>
+                    </div>
+                </div>
+                <div class="bg-slate-50 rounded-2xl p-4 mb-6">
+                    <h4 class="text-sm font-extrabold text-slate-700 mb-3">Grade Distribution</h4>
+                    <div class="flex gap-3 flex-wrap">
+                        ${['A','B','C','S','F'].map(r => {
+                            const colors = {A:'emerald',B:'blue',C:'amber',S:'orange',F:'red'};
+                            const c = colors[r];
+                            return '<div class="flex-1 min-w-[60px] text-center bg-white rounded-xl p-3 border border-slate-100"><p class="text-xl font-black text-'+c+'-500">'+rankCounts[r]+'</p><p class="text-[10px] font-bold text-slate-400 uppercase">Grade '+r+'</p></div>';
+                        }).join('')}
+                    </div>
+                </div>
+                ${subs.length === 0 ? '<p class="text-center text-slate-400 text-sm py-6">No students have completed this paper yet.</p>' : `
+                <div>
+                    <h4 class="text-sm font-extrabold text-slate-700 mb-3">All Submissions (${subs.length})</h4>
+                    <div class="overflow-auto max-h-72 rounded-xl border border-slate-200">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-slate-50 border-b border-slate-200 sticky top-0">
+                                <tr>
+                                    <th class="px-3 py-3 font-bold text-slate-500 text-xs">#</th>
+                                    <th class="px-3 py-3 font-bold text-slate-500 text-xs">Student</th>
+                                    <th class="px-3 py-3 font-bold text-slate-500 text-xs">Email</th>
+                                    <th class="px-3 py-3 font-bold text-slate-500 text-xs">Score</th>
+                                    <th class="px-3 py-3 font-bold text-slate-500 text-xs">Correct</th>
+                                    <th class="px-3 py-3 font-bold text-slate-500 text-xs">Time</th>
+                                    <th class="px-3 py-3 font-bold text-slate-500 text-xs">Rank</th>
+                                    <th class="px-3 py-3 font-bold text-slate-500 text-xs">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${subs.map((s, i) => {
+                                    const gradeColors = {A:'text-emerald-600',B:'text-blue-600',C:'text-amber-600',S:'text-orange-500',F:'text-red-500'};
+                                    const d = s.submittedAt;
+                                    const dateStr = d ? (d.getDate()+'/'+(d.getMonth()+1)+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')) : '—';
+                                    const studentName  = s.studentName  || '—';
+                                    const studentEmail = s.studentEmail || 'Guest';
+                                    return '<tr class="hover:bg-slate-50"><td class="px-3 py-3 text-slate-400 font-bold">'+(i+1)+'</td><td class="px-3 py-2"><p class="font-bold text-slate-800 text-xs">'+studentName+'</p><p class="text-[10px] text-slate-400">'+s.studentGrade+'</p></td><td class="px-3 py-2 text-xs text-blue-600 font-medium">'+studentEmail+'</td><td class="px-3 py-2 font-black text-slate-800">'+s.score+'%</td><td class="px-3 py-2 text-slate-600">'+s.correct+'/'+s.total+'</td><td class="px-3 py-2 text-slate-600 font-mono text-xs">'+fmtTime(s.timeSecs)+'</td><td class="px-3 py-2 font-black '+(gradeColors[s.rank] || 'text-slate-800')+'">'+s.rank+'</td><td class="px-3 py-2 text-slate-400 text-xs">'+dateStr+'</td></tr>';
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>`}
+            `;
+        }
+
+        function wizReset() {
+            wizState = { step: 1, questions: [], paperMeta: {} };
+            // Reset all wizard fields
+            ['wiz-grade','wiz-stream','wiz-subject','wiz-paper-type','wiz-year'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            document.getElementById('wiz-paper-name').value = '';
+            document.getElementById('wiz-stream-wrap').classList.add('hidden');
+            // Reset term indicators (term block is always visible)
+            const star  = document.getElementById('wiz-term-required-star');
+            const badge = document.getElementById('wiz-term-optional-badge');
+            if (star)  star.classList.add('hidden');
+            if (badge) badge.classList.remove('hidden');
+            document.querySelectorAll('input[name="wiz-term"]').forEach(r => r.checked = false);
+            wizGoStep(1);
+        }
+
+        function wizViewPublished() {
+            // Scroll to the published papers panel
+            document.getElementById('published-papers-list').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function loginAdmin() {
+            const email = document.getElementById('admin-email').value.trim();
+            const pass  = document.getElementById('admin-pass').value;
+            const btn   = document.getElementById('admin-btn');
+            const err   = document.getElementById('admin-error');
+            err.classList.add('hidden');
+            btn.textContent = 'Signing in...';
+            btn.disabled = true;
+
+            try {
+                // Sign in with Firebase Auth
+                const cred = await auth.signInWithEmailAndPassword(email, pass);
+
+                // Check this email is the registered admin
+                if (cred.user.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+                    await auth.signOut();
+                    throw new Error('This account does not have admin access.');
+                }
+
+                // Success — load latest data and open dashboard
+                closeModal();
+                await loadFromFirebase();
+                document.getElementById('admin-total-q').textContent        = QUIZ_DATA.length;
+                document.getElementById('admin-total-papers').textContent   = publishedPapers.length;
+                document.getElementById('published-count').textContent      = publishedPapers.length;
+                document.getElementById('admin-total-attempts').textContent = studentSubmissions.length;
+                renderPublishedPapers();
+                wizGoStep(1);
+                navTo('admin');
+
+            } catch(e) {
+                err.textContent = e.code === 'auth/user-not-found'  ? 'No admin account found with this email.' :
+                                  e.code === 'auth/wrong-password'  ? 'Wrong password. Please try again.' :
+                                  e.code === 'auth/invalid-email'   ? 'Please enter a valid email address.' :
+                                  e.code === 'auth/too-many-requests' ? 'Too many attempts. Please wait a minute.' :
+                                  e.message || 'Login failed. Please try again.';
+                err.classList.remove('hidden');
+            }
+
+            btn.textContent = 'Access Admin Dashboard';
+            btn.disabled = false;
+        }
+
+        function adminLogout() {
+            if (confirm('Logout from Admin Dashboard?')) {
+                auth.signOut();
+                navTo('home');
+            }
+        }
+
+        // ============================================================
+        //  MOBILE NAV (hamburger)
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const hamburger = document.querySelector('header button.md\\:hidden');
+            const mobileMenu = document.createElement('div');
+            mobileMenu.id = 'mobile-menu';
+            mobileMenu.className = 'fixed inset-0 bg-white z-40 hidden flex-col items-center justify-center gap-8 text-2xl font-bold text-slate-800';
+            mobileMenu.innerHTML = `
+                <button onclick="document.getElementById('mobile-menu').classList.add('hidden')" class="absolute top-6 right-6 text-slate-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <a href="#" onclick="navTo('home'); document.getElementById('mobile-menu').classList.add('hidden')" class="hover:text-blue-600">Home</a>
+                <a href="#" onclick="navTo('leaderboard'); document.getElementById('mobile-menu').classList.add('hidden')" class="hover:text-blue-600">Leaderboard</a>
+                <a href="#" onclick="navTo('about'); document.getElementById('mobile-menu').classList.add('hidden')" class="hover:text-blue-600">About Us</a>
+                <button onclick="openModal('login'); document.getElementById('mobile-menu').classList.add('hidden')" class="px-8 py-3 bg-blue-600 text-white rounded-full font-bold">Student Portal</button>`;
+            document.body.appendChild(mobileMenu);
+            if (hamburger) {
+                hamburger.onclick = () => mobileMenu.classList.toggle('hidden');
+            }
+        });
+    </script>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         PAPER RESULTS MODAL (Admin)
+    ═══════════════════════════════════════════════════════════ -->
+    <div id="paper-results-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl relative fade-in-up my-8">
+            <button onclick="document.getElementById('paper-results-modal').classList.add('hidden')"
+                class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <div class="flex items-center gap-3 mb-6 pr-8">
+                <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-extrabold text-slate-900">Paper Results & Student Activity</h3>
+                    <p class="text-xs text-slate-400">Admin View — All student submissions for this paper</p>
+                </div>
+            </div>
+            <div id="paper-results-content"></div>
+        </div>
+    </div>
+</body>
+</html>
