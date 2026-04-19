@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Select Term | Sahasra</title>
+    <meta name="description" id="page-desc" content="Select a term (1st, 2nd, or 3rd) to browse school exam papers.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Select Term | Sahasra">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey:"AIzaSyARM8N5EINxpbn9ucxK1bWOe4RDm5_z_FU",
+            authDomain:"mcq--lk.firebaseapp.com", projectId:"mcq--lk",
+            storageBucket:"mcq--lk.firebasestorage.app",
+            messagingSenderId:"842986756141",
+            appId:"1:842986756141:web:730e145fa230c7bd1640a4"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(), auth = firebase.auth();
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="flex flex-col min-h-screen">
+<div id="shared-header"></div>
+
+<main class="flex-grow pt-20">
+    <div class="bg-slate-50 border-b border-slate-200 py-3">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-sm text-slate-500 font-semibold">
+            <span id="breadcrumb-inner"></span>
+        </div>
+    </div>
+
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 fade-in-up">
+        <div class="mb-10">
+            <a id="back-btn" href="grades.html"
+               class="flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold mb-6 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                Back to Years
+            </a>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900">Select Term</h2>
+            <p id="page-subtitle" class="text-slate-500 mt-2 font-medium"></p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto w-full">
+            <a id="term-1" href="#"
+               class="hover-card p-8 rounded-3xl text-center cursor-pointer group border-2 border-transparent hover:border-blue-500 no-underline">
+                <div class="w-16 h-16 mx-auto rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">📝</div>
+                <h3 class="text-lg font-bold text-slate-800">First Term Test</h3>
+                <p id="sub-1" class="text-xs text-slate-400 font-semibold mt-1 uppercase tracking-wide"></p>
+            </a>
+            <a id="term-2" href="#"
+               class="hover-card p-8 rounded-3xl text-center cursor-pointer group border-2 border-transparent hover:border-emerald-500 no-underline">
+                <div class="w-16 h-16 mx-auto rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">📋</div>
+                <h3 class="text-lg font-bold text-slate-800">Second Term Test</h3>
+                <p id="sub-2" class="text-xs text-slate-400 font-semibold mt-1 uppercase tracking-wide"></p>
+            </a>
+            <a id="term-3" href="#"
+               class="hover-card p-8 rounded-3xl text-center cursor-pointer group border-2 border-transparent hover:border-amber-500 no-underline">
+                <div class="w-16 h-16 mx-auto rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">📄</div>
+                <h3 class="text-lg font-bold text-slate-800">Third Term Test</h3>
+                <p id="sub-3" class="text-xs text-slate-400 font-semibold mt-1 uppercase tracking-wide"></p>
+            </a>
+        </div>
+    </section>
+</main>
+
+<div id="shared-footer"></div>
+<div id="shared-modals"></div>
+
+<script src="db.js"></script>
+<script src="router.js"></script>
+<script src="shared-html.js"></script>
+<script src="nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    injectSharedHTML('subjects');
+    const p       = getParams();
+    const grade   = parseInt(p.grade) || 13;
+    const stream  = p.stream  || null;
+    const subject = p.subject || '';
+    const type    = p.type    || 'School Term Papers';
+    const year    = p.year    || '';
+
+    document.getElementById('back-btn').href =
+        buildUrl('years.html', { grade, stream:stream||'', subject, type });
+
+    document.getElementById('page-subtitle').textContent =
+        `${subject} — ${PAPER_TYPE_LABELS[type]||type} — ${year}`;
+
+    setSEOMeta({
+        title: `${subject} Grade ${grade} ${year} Term Selection`,
+        description: `Choose a term (1st, 2nd, 3rd) to access ${subject} Grade ${grade} ${type} papers for ${year}.`,
+        canonical: 'terms.html' + window.location.search
+    });
+
+    const bcSteps = [
+        { label: 'Home',   href: 'index.html'  },
+        { label: 'Grades', href: 'grades.html' }
+    ];
+    if (grade === 12 || grade === 13) {
+        bcSteps.push({ label:`Grade ${grade}`, href: buildUrl('stream.html',   { grade }) });
+        if (stream) bcSteps.push({ label: stream, href: buildUrl('subjects.html', { grade, stream }) });
+    } else {
+        bcSteps.push({ label:`Grade ${grade}`, href: buildUrl('subjects.html', { grade }) });
+    }
+    bcSteps.push({ label: subject,                       href: buildUrl('category.html', { grade, stream:stream||'', subject }) });
+    bcSteps.push({ label: PAPER_TYPE_LABELS[type]||type, href: buildUrl('years.html',    { grade, stream:stream||'', subject, type }) });
+    bcSteps.push({ label: String(year), href: null });
+    renderBreadcrumb(bcSteps);
+    injectBreadcrumbSchema(bcSteps);
+
+    // Build term links
+    const termKeys = ['First Term', 'Second Term', 'Third Term'];
+    [1,2,3].forEach(n => {
+        const term = termKeys[n-1];
+        const href = buildUrl('papers.html', { grade, stream:stream||'', subject, type, year, term });
+        document.getElementById(`term-${n}`).href = href;
+        document.getElementById(`sub-${n}`).textContent = `${year} • Term 0${n}`;
+    });
+});
+</script>
+</body>
+</html>

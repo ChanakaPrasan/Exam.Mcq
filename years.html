@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Select Year | Sahasra</title>
+    <meta name="description" id="page-desc" content="Select an examination year to browse available papers.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title"       content="Select Year | Sahasra">
+    <meta property="og:description" content="Choose an exam year to access MCQ papers on Sahasra.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey:"AIzaSyARM8N5EINxpbn9ucxK1bWOe4RDm5_z_FU",
+            authDomain:"mcq--lk.firebaseapp.com", projectId:"mcq--lk",
+            storageBucket:"mcq--lk.firebasestorage.app",
+            messagingSenderId:"842986756141",
+            appId:"1:842986756141:web:730e145fa230c7bd1640a4"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(), auth = firebase.auth();
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="flex flex-col min-h-screen">
+<div id="shared-header"></div>
+
+<main class="flex-grow pt-20">
+    <div class="bg-slate-50 border-b border-slate-200 py-3">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-sm text-slate-500 font-semibold">
+            <span id="breadcrumb-inner"></span>
+        </div>
+    </div>
+
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 fade-in-up">
+        <div class="mb-10">
+            <a id="back-btn" href="grades.html"
+               class="flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold mb-6 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                Back to Categories
+            </a>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900">Select Examination Year</h2>
+            <p id="page-subtitle" class="text-slate-500 mt-2 font-medium"></p>
+        </div>
+        <div id="year-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div class="col-span-full text-center py-16">
+                <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+                <p class="text-slate-400 font-semibold text-sm">Loading available years…</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div id="shared-footer"></div>
+<div id="shared-modals"></div>
+
+<script src="db.js"></script>
+<script src="router.js"></script>
+<script src="shared-html.js"></script>
+<script src="nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    injectSharedHTML('subjects');
+    const p       = getParams();
+    const grade   = parseInt(p.grade) || 13;
+    const stream  = p.stream  || null;
+    const subject = p.subject || '';
+    const type    = p.type    || 'National Past Papers';
+    const isPastPaper = type === 'National Past Papers';
+
+    document.getElementById('back-btn').href =
+        buildUrl('category.html', { grade, stream: stream||'', subject });
+
+    document.getElementById('page-subtitle').textContent =
+        `${subject} — ${PAPER_TYPE_LABELS[type] || type}`;
+
+    setSEOMeta({
+        title: `${subject} Grade ${grade} ${PAPER_TYPE_LABELS[type]||type} Years`,
+        description: `Select an examination year for ${subject}, Grade ${grade} ${type} papers on Sahasra.`,
+        canonical: 'years.html' + window.location.search
+    });
+
+    const bcSteps = [
+        { label: 'Home',   href: 'index.html'  },
+        { label: 'Grades', href: 'grades.html' }
+    ];
+    if (grade === 12 || grade === 13) {
+        bcSteps.push({ label: `Grade ${grade}`, href: buildUrl('stream.html',    { grade }) });
+        if (stream) bcSteps.push({ label: stream,   href: buildUrl('subjects.html', { grade, stream }) });
+    } else {
+        bcSteps.push({ label: `Grade ${grade}`, href: buildUrl('subjects.html', { grade }) });
+    }
+    bcSteps.push({ label: subject,                    href: buildUrl('category.html', { grade, stream:stream||'', subject }) });
+    bcSteps.push({ label: PAPER_TYPE_LABELS[type]||type, href: null });
+    renderBreadcrumb(bcSteps);
+    injectBreadcrumbSchema(bcSteps);
+
+    // Load years
+    loadFromFirebase().then(() => renderYears()).catch(() => renderYears());
+    // Real-time update
+    db.collection('papers').onSnapshot(() => {
+        loadFromFirebase().then(renderYears);
+    }, () => {});
+
+    function renderYears() {
+        const gradeStr = `Grade ${grade}`;
+        const years = [...new Set(
+            publishedPapers
+                .filter(pp => pp.grade === gradeStr && pp.subject === subject && pp.paperType === type && pp.year)
+                .map(pp => Number(pp.year))
+        )].sort((a,b) => b - a);
+
+        const grid = document.getElementById('year-grid');
+
+        if (!years.length) {
+            grid.innerHTML = `
+            <div class="col-span-full text-center py-20">
+                <div class="w-20 h-20 mx-auto rounded-full bg-slate-100 flex items-center justify-center mb-4 text-4xl">📭</div>
+                <h3 class="text-xl font-extrabold text-slate-700 mb-2">No Papers Yet</h3>
+                <p class="text-slate-400 text-sm">No papers published for <strong>${subject}</strong> — ${type}.<br>Check back soon!</p>
+                <a href="${buildUrl('category.html',{grade,stream:stream||'',subject})}"
+                   class="inline-block mt-6 px-6 py-3 bg-blue-600 text-white font-bold rounded-xl text-sm hover:bg-blue-700 transition">
+                   ← Back to Categories
+                </a>
+            </div>`;
+            return;
+        }
+
+        grid.innerHTML = years.map(year => {
+            const count = publishedPapers.filter(pp =>
+                pp.grade === gradeStr && pp.subject === subject &&
+                pp.paperType === type && Number(pp.year) === year
+            ).length;
+
+            // For past papers → papers.html directly; for School/Provincial → terms.html
+            const href = isPastPaper
+                ? buildUrl('papers.html', { grade, stream:stream||'', subject, type, year })
+                : buildUrl('terms.html',  { grade, stream:stream||'', subject, type, year });
+
+            return `
+            <a href="${href}"
+               class="hover-card p-8 rounded-3xl text-center cursor-pointer group border-2 border-transparent hover:border-blue-500 no-underline">
+                <div class="text-3xl font-black text-blue-600 mb-2">${year}</div>
+                <h3 class="text-sm font-bold text-slate-500 uppercase mb-2">
+                    ${isPastPaper ? 'Past Paper' : 'Term Tests'}
+                </h3>
+                <span class="text-[11px] font-bold bg-blue-50 text-blue-600 px-2 py-1 rounded-full">
+                    ${count} paper${count !== 1 ? 's' : ''}
+                </span>
+            </a>`;
+        }).join('');
+    }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Your Grade | Sahasra Education Portal</title>
+    <meta name="description" content="Choose your academic grade (6–13) to access O/L and A/L past papers, school term tests, and provincial exam papers on Sahasra.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="grades.html">
+    <meta property="og:title"       content="Select Your Grade | Sahasra">
+    <meta property="og:description" content="Access past papers and MCQ practice for every grade — O/L, A/L and more.">
+    <meta property="og:type"        content="website">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey:"AIzaSyARM8N5EINxpbn9ucxK1bWOe4RDm5_z_FU",
+            authDomain:"mcq--lk.firebaseapp.com", projectId:"mcq--lk",
+            storageBucket:"mcq--lk.firebasestorage.app",
+            messagingSenderId:"842986756141",
+            appId:"1:842986756141:web:730e145fa230c7bd1640a4"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(), auth = firebase.auth();
+    </script>
+    <link rel="stylesheet" href="style.css">
+    <!-- JSON-LD structured data -->
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+        {"@type":"ListItem","position":1,"name":"Home","item":"https://sahasra.lk/"},
+        {"@type":"ListItem","position":2,"name":"Select Grade","item":"https://sahasra.lk/grades.html"}
+    ]}</script>
+</head>
+<body class="flex flex-col min-h-screen">
+<div id="shared-header"></div>
+
+<main class="flex-grow pt-20">
+    <!-- Breadcrumb -->
+    <div class="bg-slate-50 border-b border-slate-200 py-3">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-sm text-slate-500 font-semibold">
+            <span id="breadcrumb-inner"></span>
+        </div>
+    </div>
+
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 fade-in-up">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">Select Your Grade</h2>
+            <p class="text-slate-500 max-w-2xl mx-auto">Choose your academic level to access tailored examination materials and analytics.</p>
+        </div>
+
+        <!-- Smart Search -->
+        <div class="max-w-2xl mx-auto mb-12">
+            <div class="relative">
+                <svg class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
+                     xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input id="global-search-input" type="text" autocomplete="off"
+                       placeholder='Search papers by subject, keyword, grade… e.g. "economics", "Grade 10 Science"'
+                       class="w-full pl-14 pr-14 py-4 rounded-2xl border-2 border-slate-200 bg-white shadow-md outline-none font-semibold text-slate-800 text-sm focus:border-blue-500 transition-all"
+                       oninput="globalSearchFilter(this.value)">
+                <button id="global-search-clear" onclick="clearGlobalSearch()"
+                        class="absolute right-4 top-1/2 -translate-y-1/2 hidden w-7 h-7 rounded-full bg-slate-200 hover:bg-slate-300 transition flex items-center justify-center text-slate-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div id="global-search-results" class="hidden mt-3 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden max-h-96 overflow-y-auto">
+                <div id="global-search-list" class="divide-y divide-slate-100"></div>
+                <div id="global-search-no-results" class="hidden py-10 text-center">
+                    <div class="text-3xl mb-2">🔍</div>
+                    <p class="font-extrabold text-slate-700 text-sm mb-1">No results found</p>
+                    <p class="text-slate-400 text-xs">Try a different keyword or browse grades below</p>
+                </div>
+                <div id="global-search-hint" class="py-3 px-4 bg-slate-50 border-t border-slate-100">
+                    <p class="text-xs text-slate-400 font-semibold text-center">Searching all published papers…</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grade cards grid — built by JS -->
+        <div id="grade-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+    </section>
+</main>
+
+<div id="shared-footer"></div>
+<div id="shared-modals"></div>
+
+<script src="db.js"></script>
+<script src="router.js"></script>
+<script src="shared-html.js"></script>
+<script src="nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    injectSharedHTML('subjects');
+    loadFromFirebase();
+    startPapersListener();
+
+    // SEO
+    setSEOMeta({
+        title: 'Select Your Grade',
+        description: 'Browse past papers and MCQ tests by grade — O/L, A/L, and junior levels on Sahasra Education Portal.',
+        canonical: 'grades.html'
+    });
+    renderBreadcrumb([
+        { label: 'Home',         href: 'index.html' },
+        { label: 'Select Grade', href: null }
+    ]);
+    injectBreadcrumbSchema([
+        { label: 'Home',         href: 'index.html' },
+        { label: 'Select Grade', href: 'grades.html' }
+    ]);
+
+    buildGradeCards();
+});
+
+function buildGradeCards() {
+    const grades = [
+        { val: 6,  label: 'Grade 06',   color: 'blue',    emoji: '6'  },
+        { val: 7,  label: 'Grade 07',   color: 'emerald', emoji: '7'  },
+        { val: 8,  label: 'Grade 08',   color: 'amber',   emoji: '8'  },
+        { val: 9,  label: 'Grade 09',   color: 'purple',  emoji: '9'  },
+        { val: 10, label: 'Grade 10',   color: 'rose',    emoji: '10' },
+        { val: 11, label: 'O/L Exam',   color: 'blue',    emoji: '11' },
+        { val: 12, label: 'A/L Year 1', color: 'emerald', emoji: '12' },
+        { val: 13, label: 'A/L Year 2', color: 'amber',   emoji: '13' }
+    ];
+    const grid = document.getElementById('grade-grid');
+    grid.innerHTML = grades.map(g => {
+        // For A/L grades, go to stream.html; others go directly to subjects.html
+        const href = (g.val === 12 || g.val === 13)
+            ? buildUrl('stream.html', { grade: g.val })
+            : buildUrl('subjects.html', { grade: g.val });
+        return `
+        <a href="${href}" class="hover-card p-8 rounded-3xl text-center cursor-pointer group no-underline">
+            <div class="w-16 h-16 mx-auto rounded-2xl bg-${g.color}-100 text-${g.color}-600 flex items-center justify-center text-2xl font-black mb-4 group-hover:scale-110 transition-transform">${g.emoji}</div>
+            <h3 class="text-lg font-bold text-slate-800">${g.label}</h3>
+            ${g.val >= 12 ? '<span class="inline-block mt-2 text-[10px] uppercase font-bold px-2 py-1 bg-slate-100 text-slate-500 rounded">Stream Selection</span>' : ''}
+        </a>`;
+    }).join('');
+}
+
+// ── Global search (unchanged logic from script.js, uses Paper.html for direct links) ──
+(function () {
+    let _t = null;
+    function esc(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+    function hl(t, q) { return String(t||'').replace(new RegExp('(' + esc(q) + ')', 'gi'), '<mark style="background:#fef08a;font-weight:700;border-radius:3px;padding:1px 2px">$1</mark>'); }
+
+    window.globalSearchFilter = function (raw) {
+        clearTimeout(_t);
+        _t = setTimeout(() => run(raw), 150);
+    };
+    function run(raw) {
+        const q = raw.trim();
+        const results = document.getElementById('global-search-results');
+        const list    = document.getElementById('global-search-list');
+        const noRes   = document.getElementById('global-search-no-results');
+        const hint    = document.getElementById('global-search-hint');
+        const clearBtn= document.getElementById('global-search-clear');
+        clearBtn && clearBtn.classList.toggle('hidden', !q);
+        if (!q) { results.classList.add('hidden'); return; }
+        results.classList.remove('hidden');
+        noRes.classList.add('hidden');
+        list.innerHTML = '';
+        const rx = new RegExp(esc(q), 'i');
+        const papers = (typeof publishedPapers !== 'undefined' ? publishedPapers : [])
+            .filter(p => rx.test(p.paperName||'') || rx.test(p.subject||'') || rx.test(p.grade||'') || rx.test(String(p.year||'')))
+            .slice(0, 8);
+        if (!papers.length) { noRes.classList.remove('hidden'); hint && hint.classList.add('hidden'); return; }
+        hint && hint.classList.remove('hidden');
+        papers.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'flex items-center gap-3 px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors';
+            div.innerHTML = `
+                <div class="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="font-bold text-slate-800 text-sm truncate">${hl(p.paperName||'Untitled', q)}</p>
+                    <p class="text-xs text-slate-400 truncate">${hl(p.grade||'', q)} · ${hl(p.subject||'', q)} · ${hl(String(p.year||''), q)}</p>
+                </div>
+                <span class="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full shrink-0">${p.questionCount||0}Q</span>`;
+            div.onclick = () => { window.location.href = `Paper.html?id=${encodeURIComponent(p.id)}`; };
+            list.appendChild(div);
+        });
+        hint && (hint.innerHTML = `<p class="text-xs text-slate-400 font-semibold text-center">${papers.length} result${papers.length!==1?'s':''} found</p>`);
+    }
+    window.clearGlobalSearch = function () {
+        const inp = document.getElementById('global-search-input');
+        if (inp) inp.value = '';
+        document.getElementById('global-search-results')?.classList.add('hidden');
+        document.getElementById('global-search-clear')?.classList.add('hidden');
+    };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Select Subject | Sahasra</title>
+    <meta name="description" id="page-desc" content="Select a subject to access MCQ papers and practice tests on Sahasra.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title"       content="Select Subject | Sahasra">
+    <meta property="og:description" content="Choose a subject to start practising with past papers and term tests.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey:"AIzaSyARM8N5EINxpbn9ucxK1bWOe4RDm5_z_FU",
+            authDomain:"mcq--lk.firebaseapp.com", projectId:"mcq--lk",
+            storageBucket:"mcq--lk.firebasestorage.app",
+            messagingSenderId:"842986756141",
+            appId:"1:842986756141:web:730e145fa230c7bd1640a4"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(), auth = firebase.auth();
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="flex flex-col min-h-screen">
+<div id="shared-header"></div>
+
+<main class="flex-grow pt-20">
+    <div class="bg-slate-50 border-b border-slate-200 py-3">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-sm text-slate-500 font-semibold">
+            <span id="breadcrumb-inner"></span>
+        </div>
+    </div>
+
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 fade-in-up">
+        <div class="mb-10">
+            <a id="back-btn" href="grades.html" class="flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold mb-6 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                Back to Grades
+            </a>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900">Select Subject</h2>
+            <p id="page-subtitle" class="text-slate-500 mt-2 font-medium"></p>
+        </div>
+        <div id="subjects-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+    </section>
+</main>
+
+<div id="shared-footer"></div>
+<div id="shared-modals"></div>
+
+<script src="db.js"></script>
+<script src="router.js"></script>
+<script src="shared-html.js"></script>
+<script src="nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    injectSharedHTML('subjects');
+    const p      = getParams();
+    const grade  = parseInt(p.grade) || 13;
+    const stream = p.stream || null;
+
+    // ── Back button ──────────────────────────────────────────
+    const backBtn = document.getElementById('back-btn');
+    if (grade === 12 || grade === 13) {
+        backBtn.href      = buildUrl('stream.html', { grade });
+        backBtn.textContent = '← Back to Streams';
+        // re-add SVG
+        backBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg> Back to Streams`;
+    }
+
+    // ── SEO ──────────────────────────────────────────────────
+    const subtitle = stream ? `Grade ${grade} • ${stream} Stream` : `Grade ${grade} General Education`;
+    document.getElementById('page-subtitle').textContent = subtitle;
+    setSEOMeta({
+        title: `Grade ${grade}${stream ? ' '+stream : ''} Subjects`,
+        description: `Select a subject for Grade ${grade}${stream ? ', '+stream+' stream' : ''} to access MCQ papers on Sahasra.`,
+        canonical: `subjects.html?grade=${grade}${stream?'&stream='+encodeURIComponent(stream):''}`
+    });
+
+    const bcSteps = [
+        { label: 'Home',           href: 'index.html'  },
+        { label: 'Grades',         href: 'grades.html' }
+    ];
+    if (grade === 12 || grade === 13) {
+        bcSteps.push({ label: `Grade ${grade}`, href: buildUrl('stream.html', { grade }) });
+        if (stream) bcSteps.push({ label: stream, href: null });
+    } else {
+        bcSteps.push({ label: `Grade ${grade}`, href: null });
+    }
+    renderBreadcrumb(bcSteps);
+    injectBreadcrumbSchema(bcSteps);
+
+    // ── Subject map ─────────────────────────────────────────
+    const SUBJECT_MAP = {
+        '6':  [{name:'Mathematics',icon:'📐',color:'blue'},{name:'Science',icon:'🔬',color:'emerald'},{name:'English',icon:'📚',color:'amber'},{name:'Sinhala',icon:'📝',color:'purple'},{name:'History',icon:'🏛️',color:'rose'},{name:'Geography',icon:'🌍',color:'blue'}],
+        '7':  [{name:'Mathematics',icon:'📐',color:'blue'},{name:'Science',icon:'🔬',color:'emerald'},{name:'English',icon:'📚',color:'amber'},{name:'Sinhala',icon:'📝',color:'purple'},{name:'History',icon:'🏛️',color:'rose'},{name:'Geography',icon:'🌍',color:'blue'}],
+        '8':  [{name:'Mathematics',icon:'📐',color:'blue'},{name:'Science',icon:'🔬',color:'emerald'},{name:'English',icon:'📚',color:'amber'},{name:'Sinhala',icon:'📝',color:'purple'},{name:'History',icon:'🏛️',color:'rose'},{name:'Geography',icon:'🌍',color:'blue'}],
+        '9':  [{name:'Mathematics',icon:'📐',color:'blue'},{name:'Science',icon:'🔬',color:'emerald'},{name:'English',icon:'📚',color:'amber'},{name:'Sinhala',icon:'📝',color:'purple'},{name:'History',icon:'🏛️',color:'rose'},{name:'Geography',icon:'🌍',color:'blue'}],
+        '10': [{name:'Mathematics',icon:'📐',color:'blue'},{name:'Science',icon:'🔬',color:'emerald'},{name:'English',icon:'📚',color:'amber'},{name:'Sinhala',icon:'📝',color:'purple'},{name:'History',icon:'🏛️',color:'rose'},{name:'ICT',icon:'💻',color:'emerald'},{name:'Commerce',icon:'📊',color:'amber'},{name:'Geography',icon:'🌍',color:'blue'}],
+        '11': [{name:'Mathematics',icon:'📐',color:'blue'},{name:'Science',icon:'🔬',color:'emerald'},{name:'English',icon:'📚',color:'amber'},{name:'Sinhala',icon:'📝',color:'purple'},{name:'History',icon:'🏛️',color:'rose'},{name:'ICT',icon:'💻',color:'emerald'},{name:'Commerce',icon:'📊',color:'amber'},{name:'Geography',icon:'🌍',color:'blue'}],
+        'Physical Science (Maths)': [{name:'Combined Mathematics',icon:'📐',color:'blue'},{name:'Physics',icon:'⚡',color:'emerald'},{name:'Chemistry',icon:'🧪',color:'rose'},{name:'ICT',icon:'💻',color:'amber'}],
+        'Biological Science':        [{name:'Biology',icon:'🧬',color:'emerald'},{name:'Physics',icon:'⚡',color:'blue'},{name:'Chemistry',icon:'🧪',color:'rose'},{name:'Agricultural Science',icon:'🌱',color:'amber'}],
+        'Commerce':                  [{name:'Accounting',icon:'📒',color:'blue'},{name:'Business Studies',icon:'🏢',color:'emerald'},{name:'Economics',icon:'📈',color:'amber'},{name:'ICT',icon:'💻',color:'purple'}],
+        'Arts':                      [{name:'Sinhala',icon:'📝',color:'purple'},{name:'History',icon:'🏛️',color:'rose'},{name:'Logic',icon:'🧠',color:'blue'},{name:'Geography',icon:'🌍',color:'emerald'}],
+        'Technology':                [{name:'Science for Tech',icon:'⚙️',color:'blue'},{name:'Engineering Tech',icon:'🔧',color:'emerald'},{name:'Bio Systems Tech',icon:'🔬',color:'rose'},{name:'ICT',icon:'💻',color:'amber'}]
+    };
+
+    const key = stream || String(grade);
+    const subjects = SUBJECT_MAP[key] || SUBJECT_MAP[String(grade)] || [];
+
+    const grid = document.getElementById('subjects-grid');
+    grid.innerHTML = subjects.map(s => {
+        const href = buildUrl('category.html', { grade, stream: stream||'', subject: s.name });
+        return `
+        <a href="${href}" class="hover-card p-8 rounded-3xl text-center cursor-pointer group no-underline">
+            <div class="w-16 h-16 mx-auto rounded-2xl bg-${s.color}-50 text-3xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">${s.icon}</div>
+            <h3 class="text-lg font-bold text-slate-800">${s.name}</h3>
+        </a>`;
+    }).join('');
+});
+</script>
+</body>
+</html>

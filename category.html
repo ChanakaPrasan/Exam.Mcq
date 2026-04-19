@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Select Paper Category | Sahasra</title>
+    <meta name="description" id="page-desc" content="Choose between National Past Papers, School Term Papers, or Provincial Papers.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title"       content="Select Paper Category | Sahasra">
+    <meta property="og:description" content="Choose your paper category to find the right MCQ practice materials.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey:"AIzaSyARM8N5EINxpbn9ucxK1bWOe4RDm5_z_FU",
+            authDomain:"mcq--lk.firebaseapp.com", projectId:"mcq--lk",
+            storageBucket:"mcq--lk.firebasestorage.app",
+            messagingSenderId:"842986756141",
+            appId:"1:842986756141:web:730e145fa230c7bd1640a4"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(), auth = firebase.auth();
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="flex flex-col min-h-screen">
+<div id="shared-header"></div>
+
+<main class="flex-grow pt-20">
+    <div class="bg-slate-50 border-b border-slate-200 py-3">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-sm text-slate-500 font-semibold">
+            <span id="breadcrumb-inner"></span>
+        </div>
+    </div>
+
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 fade-in-up">
+        <div class="mb-10">
+            <a id="back-btn" href="grades.html"
+               class="flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold mb-6 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                Back to Subjects
+            </a>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900">Select Paper Category</h2>
+            <p id="page-subtitle" class="text-slate-500 mt-2 font-medium"></p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8" id="category-grid"></div>
+    </section>
+</main>
+
+<div id="shared-footer"></div>
+<div id="shared-modals"></div>
+
+<script src="db.js"></script>
+<script src="router.js"></script>
+<script src="shared-html.js"></script>
+<script src="nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    injectSharedHTML('subjects');
+    const p       = getParams();
+    const grade   = parseInt(p.grade) || 13;
+    const stream  = p.stream  || null;
+    const subject = p.subject || '';
+
+    // Back button → subjects.html preserving grade + stream
+    const backHref = buildUrl('subjects.html', { grade, stream: stream||'' });
+    document.getElementById('back-btn').href = backHref;
+
+    // Subtitle
+    const subtitle = stream ? `Grade ${grade} • ${stream} • ${subject}` : `Grade ${grade} • ${subject}`;
+    document.getElementById('page-subtitle').textContent = subtitle;
+
+    setSEOMeta({
+        title: `${subject} — Grade ${grade} Papers`,
+        description: `Choose Past Papers, School Term Tests, or Provincial Papers for ${subject}, Grade ${grade} on Sahasra.`,
+        canonical: window.location.search ? 'category.html' + window.location.search : 'category.html'
+    });
+
+    const bcSteps = [
+        { label: 'Home',    href: 'index.html'  },
+        { label: 'Grades',  href: 'grades.html' }
+    ];
+    if (grade === 12 || grade === 13) {
+        bcSteps.push({ label: `Grade ${grade}`, href: buildUrl('stream.html',  { grade }) });
+        if (stream) bcSteps.push({ label: stream,   href: buildUrl('subjects.html', { grade, stream }) });
+    } else {
+        bcSteps.push({ label: `Grade ${grade}`, href: buildUrl('subjects.html', { grade }) });
+    }
+    bcSteps.push({ label: subject, href: null });
+    renderBreadcrumb(bcSteps);
+    injectBreadcrumbSchema(bcSteps);
+
+    // Categories
+    const categories = [
+        {
+            type: 'National Past Papers',
+            label: 'Past Papers',
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`,
+            iconBg: 'bg-blue-50 text-blue-600',
+            desc: 'Official Dept of Examination papers (2015–2024).',
+            // Past papers → years.html
+            dest: () => buildUrl('years.html', { grade, stream: stream||'', subject, type: 'National Past Papers' }),
+            // Hide for junior grades 6-10
+            hide: grade >= 6 && grade <= 10
+        },
+        {
+            type: 'School Term Papers',
+            label: 'School Papers',
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3 10 9-10 9-10-9 10-9z"/><path d="m2 12 10 9 10-9"/></svg>`,
+            iconBg: 'bg-emerald-50 text-emerald-600',
+            desc: 'Curated papers from Royal, Ananda, and Visakha.',
+            // School/Provincial → terms.html (year selection first via terms flow)
+            dest: () => buildUrl('years.html', { grade, stream: stream||'', subject, type: 'School Term Papers' }),
+            hide: false
+        },
+        {
+            type: 'Provincial Papers',
+            label: 'Provincial',
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`,
+            iconBg: 'bg-amber-50 text-amber-600',
+            desc: 'Tests from Western, Central, and Southern provinces.',
+            dest: () => buildUrl('years.html', { grade, stream: stream||'', subject, type: 'Provincial Papers' }),
+            hide: false
+        }
+    ];
+
+    const grid = document.getElementById('category-grid');
+    grid.innerHTML = categories
+        .filter(c => !c.hide)
+        .map(c => `
+        <a href="${c.dest()}" class="hover-card p-6 sm:p-10 rounded-2xl sm:rounded-3xl cursor-pointer text-center no-underline">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto ${c.iconBg} rounded-full flex items-center justify-center mb-4 sm:mb-6">
+                ${c.icon}
+            </div>
+            <h3 class="text-xl font-bold mb-2 sm:mb-3 text-slate-800">${c.label}</h3>
+            <p class="text-slate-500 text-sm">${c.desc}</p>
+        </a>`).join('');
+});
+</script>
+</body>
+</html>

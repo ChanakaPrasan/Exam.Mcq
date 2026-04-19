@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SAHASRA | The Academic Sanctuary</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#4059aa",
+                        "primary": "#00236f",
+                        "on-surface-variant": "#444651",
+                        "on-primary-fixed": "#00164e",
+                        "on-background": "#191c1e",
+                        "on-secondary-fixed": "#002114",
+                        "inverse-on-surface": "#eff1f3",
+                        "surface-container-high": "#e6e8ea",
+                        "secondary-fixed": "#85f8c4",
+                        "tertiary-fixed": "#ffdcc3",
+                        "surface-container": "#eceef0",
+                        "surface-container-low": "#f2f4f6",
+                        "on-primary-fixed-variant": "#264191",
+                        "secondary": "#006c4a",
+                        "on-primary-container": "#90a8ff",
+                        "on-error": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#f7f9fb",
+                        "background": "#f7f9fb",
+                        "secondary-fixed-dim": "#68dba9",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#d8dadc",
+                        "on-secondary-container": "#00714e",
+                        "primary-container": "#1e3a8a",
+                        "inverse-primary": "#b6c4ff",
+                        "tertiary": "#442100",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#c5c5d3",
+                        "on-surface": "#191c1e",
+                        "outline": "#757682",
+                        "tertiary-container": "#653400",
+                        "surface-container-highest": "#e0e3e5",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#fc922b",
+                        "on-tertiary-fixed": "#2f1500",
+                        "secondary-container": "#82f5c1",
+                        "surface": "#f7f9fb",
+                        "inverse-surface": "#2d3133",
+                        "on-secondary-fixed-variant": "#005137",
+                        "surface-variant": "#e0e3e5",
+                        "primary-fixed": "#dce1ff",
+                        "on-tertiary-fixed-variant": "#6e3900"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-header {
+            backdrop-filter: blur(24px);
+        }
+        .premium-gradient {
+            background: linear-gradient(135deg, #00236f 0%, #1e3a8a 100%);
+        }
+        .cultural-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l15 30-15 30-15-30z' fill='%23c5c5d3' fill-opacity='0.05'/%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface selection:bg-secondary-container">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl shadow-[0px_20px_40px_rgba(25,28,30,0.04)]">
+<div class="flex justify-between items-center max-w-7xl mx-auto px-8 h-20">
+<div class="text-2xl font-black text-blue-900 dark:text-blue-100 flex items-center gap-2 font-headline tracking-tight">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">temple_hindu</span>
+                SAHASRA
+            </div>
+<div class="hidden md:flex items-center gap-8">
+<a class="font-['Manrope'] font-bold tracking-tight text-blue-900 dark:text-blue-400 border-b-2 border-blue-900 dark:border-blue-400 pb-1" href="#">Home</a>
+<a class="font-['Manrope'] font-bold tracking-tight text-slate-600 dark:text-slate-400 hover:text-blue-800 dark:hover:text-blue-200 transition-all duration-300" href="#">Subjects</a>
+<a class="font-['Manrope'] font-bold tracking-tight text-slate-600 dark:text-slate-400 hover:text-blue-800 dark:hover:text-blue-200 transition-all duration-300" href="#">Leaderboard</a>
+<a class="font-['Manrope'] font-bold tracking-tight text-slate-600 dark:text-slate-400 hover:text-blue-800 dark:hover:text-blue-200 transition-all duration-300" href="#">About Us</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-primary-container text-on-primary-container px-6 py-2.5 rounded-full font-bold scale-95 active:scale-90 transition-transform hover:bg-slate-50 dark:hover:bg-slate-800">
+                    Student Portal
+                </button>
+</div>
+</div>
+</nav>
+<main class="cultural-pattern pt-20">
+<!-- Modern Hero Section -->
+<section class="relative min-h-[921px] flex items-center px-8 overflow-hidden">
+<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+<div class="lg:col-span-6 z-10">
+<span class="inline-block px-4 py-1.5 bg-secondary-container text-on-secondary-container rounded-full text-sm font-bold tracking-wider mb-6">SRI LANKA'S PREMIER LEARNING SANCTUARY</span>
+<h1 class="text-6xl lg:text-8xl font-headline font-extrabold text-primary leading-[1.1] mb-8 tracking-tighter">
+                        Illuminate Your <span class="text-secondary italic">Future Path</span>
+</h1>
+<p class="text-xl text-on-surface-variant leading-relaxed max-w-xl mb-10">
+                        Experience a prestigious digital environment designed for academic excellence. Merging Sri Lankan cultural wisdom with cutting-edge educational technology.
+                    </p>
+<div class="flex flex-wrap gap-4">
+<button class="premium-gradient text-white px-8 py-4 rounded-xl text-lg font-bold shadow-xl flex items-center gap-3 scale-100 hover:scale-105 transition-transform">
+                            Start Practicing Now
+                            <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="bg-surface-container-lowest text-primary px-8 py-4 rounded-xl text-lg font-bold hover:bg-surface-container transition-colors">
+                            Explore Curriculum
+                        </button>
+</div>
+</div>
+<div class="lg:col-span-6 relative">
+<div class="relative w-full aspect-square rounded-xl overflow-hidden shadow-2xl">
+<img class="w-full h-full object-cover" data-alt="a diverse group of ambitious Sri Lankan students studying together in a modern, sunlit university library with large windows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtyYcK_f5NFbaElZFwDsMaoPJJfY7TkUu5prPwjV9RVwgy1yK45kFZNNrAgIsGfzoDnVMknYu5aCdw-YJLH86tdieMhTq9TNB1OvqrVJ6awvEWlDst-ysJ7kYEt31Y5Rwv-TFGPlulkSyENm1tAaaV-yqL1ZwNRbw1cGZM8hMdu3z2zCh3dzX1wI8F2iY3UxxpZ0D6aU5RC7EgBUXTKZYMyHhy7NFZjjzeJmoOKpOUeGdsB9isGlaaPzXAmNsXufUZO12FGJiCxg"/>
+<div class="absolute inset-0 bg-gradient-to-tr from-primary/40 to-transparent"></div>
+</div>
+<!-- Overlapping Glass Card -->
+<div class="absolute -bottom-8 -left-8 bg-white/80 backdrop-blur-xl p-8 rounded-xl shadow-2xl max-w-xs border border-white/20">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container">military_tech</span>
+</div>
+<div>
+<div class="text-2xl font-bold text-primary">45,000+</div>
+<div class="text-sm text-on-surface-variant">Active Scholars</div>
+</div>
+</div>
+<p class="text-xs text-on-surface-variant leading-tight">Join the highest rated educational network in the island.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Links (Bento Style) -->
+<section class="max-w-7xl mx-auto px-8 py-32">
+<div class="mb-16">
+<h2 class="text-4xl font-headline font-bold text-primary mb-4">Academic Navigation</h2>
+<p class="text-on-surface-variant">Quick access to your primary learning modules and progress trackers.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-6 h-auto md:h-[600px]">
+<div class="md:col-span-2 md:row-span-2 bg-surface-container-lowest p-10 rounded-xl flex flex-col justify-between hover:bg-surface-container-low transition-colors group cursor-pointer relative overflow-hidden">
+<div class="z-10">
+<span class="material-symbols-outlined text-primary text-5xl mb-6">book_5</span>
+<h3 class="text-3xl font-headline font-bold text-primary mb-4">Curated Subjects</h3>
+<p class="text-on-surface-variant text-lg">Comprehensive curriculum mapping for G.C.E. O/L and A/L examinations.</p>
+</div>
+<div class="flex items-center gap-2 font-bold text-primary z-10 group-hover:gap-4 transition-all">
+                        Browse Modules <span class="material-symbols-outlined">trending_flat</span>
+</div>
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary-container/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
+</div>
+<div class="md:col-span-2 bg-secondary-container/30 p-10 rounded-xl flex items-center gap-8 group cursor-pointer hover:bg-secondary-container/50 transition-colors">
+<div class="flex-1">
+<h3 class="text-2xl font-headline font-bold text-on-secondary-container mb-2">Global Leaderboard</h3>
+<p class="text-on-secondary-fixed-variant">See where you stand among the top performers nationwide.</p>
+</div>
+<span class="material-symbols-outlined text-6xl text-secondary" style="font-variation-settings: 'FILL' 1;">emoji_events</span>
+</div>
+<div class="bg-surface-container-low p-10 rounded-xl flex flex-col justify-center text-center group cursor-pointer hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-3xl mb-4 text-primary">diversity_3</span>
+<h3 class="text-lg font-headline font-bold text-primary">About Us</h3>
+</div>
+<div class="bg-primary text-white p-10 rounded-xl flex flex-col justify-center text-center group cursor-pointer relative overflow-hidden">
+<span class="material-symbols-outlined text-3xl mb-4" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<h3 class="text-lg font-headline font-bold">My Dashboard</h3>
+<div class="absolute bottom-0 right-0 p-2">
+<span class="material-symbols-outlined opacity-20 text-6xl">north_east</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Portal Access Section -->
+<section class="bg-surface-container py-32 px-8">
+<div class="max-w-7xl mx-auto">
+<div class="text-center max-w-2xl mx-auto mb-20">
+<h2 class="text-4xl font-headline font-bold text-primary mb-6">Secure Access Portals</h2>
+<p class="text-on-surface-variant">Log in to your specialized workspace or join our community of learners to begin your journey.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Student Login -->
+<div class="bg-surface-container-lowest p-10 rounded-xl shadow-[0px_20px_40px_rgba(25,28,30,0.04)] border border-outline-variant/10">
+<div class="w-14 h-14 bg-primary-fixed rounded-xl flex items-center justify-center mb-8">
+<span class="material-symbols-outlined text-primary">school</span>
+</div>
+<h3 class="text-2xl font-headline font-bold text-primary mb-4">Student Login</h3>
+<p class="text-on-surface-variant mb-8 leading-relaxed">Access your personalized learning path, quizzes, and performance metrics.</p>
+<button class="w-full py-4 border-2 border-primary text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-all">
+                            Access Portal
+                        </button>
+</div>
+<!-- Registration -->
+<div class="bg-primary p-10 rounded-xl shadow-2xl transform md:-translate-y-4">
+<div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center mb-8">
+<span class="material-symbols-outlined text-white">person_add</span>
+</div>
+<h3 class="text-2xl font-headline font-bold text-white mb-4">Registration</h3>
+<p class="text-primary-fixed/80 mb-8 leading-relaxed">New to SAHASRA? Create your academic profile today to unlock all resources.</p>
+<button class="w-full py-4 bg-white text-primary font-bold rounded-xl hover:bg-primary-fixed transition-colors">
+                            Join Now
+                        </button>
+</div>
+<!-- Admin Access -->
+<div class="bg-surface-container-lowest p-10 rounded-xl shadow-[0px_20px_40px_rgba(25,28,30,0.04)] border border-outline-variant/10">
+<div class="w-14 h-14 bg-tertiary-fixed rounded-xl flex items-center justify-center mb-8">
+<span class="material-symbols-outlined text-tertiary">admin_panel_settings</span>
+</div>
+<h3 class="text-2xl font-headline font-bold text-primary mb-4">Admin Login</h3>
+<p class="text-on-surface-variant mb-8 leading-relaxed">Management and administrative tools for SAHASRA authorized personnel.</p>
+<button class="w-full py-4 border-2 border-outline-variant text-on-surface-variant font-bold rounded-xl hover:bg-surface-container transition-all">
+                            Administrator Entry
+                        </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full rounded-t-[3rem] mt-20 bg-slate-50 dark:bg-slate-950">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 max-w-7xl mx-auto px-12 py-16">
+<div class="md:col-span-1">
+<div class="text-xl font-bold text-blue-900 dark:text-blue-200 mb-6 font-headline">SAHASRA</div>
+<p class="text-slate-500 font-['Inter'] text-sm leading-relaxed mb-6">
+                    A dedicated space for the modern Sri Lankan student, fostering wisdom through heritage and technology.
+                </p>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-blue-900 cursor-pointer">social_leaderboard</span>
+<span class="material-symbols-outlined text-blue-900 cursor-pointer">language</span>
+</div>
+</div>
+<div>
+<h4 class="font-bold text-blue-900 dark:text-blue-400 mb-6 font-headline">Quick Navigation</h4>
+<ul class="space-y-4">
+<li><a class="text-slate-500 hover:text-blue-700 dark:hover:text-blue-300 underline-offset-4 hover:underline font-['Inter'] text-sm" href="#">Home</a></li>
+<li><a class="text-slate-500 hover:text-blue-700 dark:hover:text-blue-300 underline-offset-4 hover:underline font-['Inter'] text-sm" href="#">Subjects</a></li>
+<li><a class="text-slate-500 hover:text-blue-700 dark:hover:text-blue-300 underline-offset-4 hover:underline font-['Inter'] text-sm" href="#">Leaderboard</a></li>
+<li><a class="text-slate-500 hover:text-blue-700 dark:hover:text-blue-300 underline-offset-4 hover:underline font-['Inter'] text-sm" href="#">About Us</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-blue-900 dark:text-blue-400 mb-6 font-headline">Student Portals</h4>
+<ul class="space-y-4">
+<li><a class="text-slate-500 hover:text-blue-700 dark:hover:text-blue-300 underline-offset-4 hover:underline font-['Inter'] text-sm" href="#">Student Login</a></li>
+<li><a class="text-slate-500 hover:text-blue-700 dark:hover:text-blue-300 underline-offset-4 hover:underline font-['Inter'] text-sm" href="#">Student Registration</a></li>
+<li><a class="text-slate-500 hover:text-blue-700 dark:hover:text-blue-300 underline-offset-4 hover:underline font-['Inter'] text-sm" href="#">Student Dashboard</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-blue-900 dark:text-blue-400 mb-6 font-headline">Management</h4>
+<ul class="space-y-4">
+<li><a class="text-slate-500 hover:text-blue-700 dark:hover:text-blue-300 underline-offset-4 hover:underline font-['Inter'] text-sm" href="#">Admin Login</a></li>
+<li><a class="text-slate-500 hover:text-blue-700 dark:hover:text-blue-300 underline-offset-4 hover:underline font-['Inter'] text-sm" href="#">Admin Dashboard</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-7xl mx-auto px-12 py-8 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-slate-500 font-['Inter'] text-xs">
+                © 2024 SAHASRA Educational Platform. All Sri Lankan Cultural Heritage Reserved.
+            </p>
+<div class="flex gap-8">
+<a class="text-slate-500 text-xs hover:text-blue-900" href="#">Privacy Policy</a>
+<a class="text-slate-500 text-xs hover:text-blue-900" href="#">Terms of Service</a>
+</div>
+</div>
+</footer>
+</body></html>

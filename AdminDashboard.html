@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">  
+<head>        
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Sahasra – Manage Papers & Students</title>
+    <meta name="description" content="Sahasra admin dashboard for uploading papers, managing questions, and reviewing student activity.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://yourdomain.com/AdminDashboard.html">
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        window.MathJax = {
+            tex: { 
+                inlineMath: [["\\(","\\)"],["$","$"]],
+                displayMath: [["\\[","\\]"],["$$","$$"]],
+                packages: {"[+]": ["ams"]},
+                tags: "ams"
+            },
+            options: { skipHtmlTags: ["script","noscript","style","textarea","pre"] },
+            startup: { typeset: false }
+        };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js" crossorigin="anonymous"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyARM8N5EINxpbn9ucxK1bWOe4RDm5_z_FU",
+            authDomain: "mcq--lk.firebaseapp.com",
+            projectId: "mcq--lk",
+            storageBucket: "mcq--lk.firebasestorage.app",
+            messagingSenderId: "842986756141",
+            appId: "1:842986756141:web:730e145fa230c7bd1640a4"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db   = firebase.firestore();
+        const auth = firebase.auth();
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+ <body class="flex flex-col min-h-screen">
+
+    <header class="glass-header fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="index.html" class="flex items-center gap-3 cursor-pointer no-underline">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-800 to-blue-600 flex items-center justify-center shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="text-white" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-extrabold text-blue-900 tracking-tight">SAHASRA</h1>
+                        <p class="text-[10px] uppercase tracking-widest text-emerald-700 font-bold -mt-1">Education Portal</p>
+                    </div>
+                </a>
+                <nav class="hidden md:flex space-x-8 font-semibold text-slate-600">
+                    <a href="index.html" class="hover:text-blue-600 transition">Home</a>
+                    <a href="Subject.html" class="hover:text-blue-600 transition">Subjects</a>
+                    <a href="Leaderboard.html" class="hover:text-blue-600 transition">Leaderboard</a>
+                    <a href="AboutUs.html" class="hover:text-blue-600 transition">About Us</a>
+                </nav>
+                <div class="flex items-center gap-4">
+                    <a href="StudentLogin.html" id="nav-login-btn" class="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-blue-600 text-blue-600 font-bold hover:bg-blue-50 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        Student Portal
+                    </a>
+                    <div id="nav-user-info" class="hidden items-center gap-3">
+                        <a href="StudentDashboard.html" class="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-bold text-sm hover:bg-blue-100 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                            My Dashboard
+                        </a>
+                        <div class="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-200">
+                            <div class="w-7 h-7 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold" id="nav-avatar">?</div>
+                            <span id="nav-username" class="text-sm font-bold text-emerald-800">Student</span>
+                        </div>
+                        <button onclick="studentLogout()" class="text-xs font-bold text-slate-400 hover:text-red-500 transition px-2 py-1">Logout</button>
+                    </div>
+                    <button id="hamburger-btn" class="md:hidden text-slate-800 p-1 rounded-lg hover:bg-slate-100 transition shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div id="mobile-menu" class="fixed inset-0 bg-white z-40 hidden flex-col items-center justify-center gap-8 text-2xl font-bold text-slate-800  ">
+        <button onclick="document.getElementById('mobile-menu').classList.add('hidden')" class="absolute top-6 right-6 text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <a href="index.html" class="hover:text-blue-600">Home</a>
+        <a href="Subject.html" class="hover:text-blue-600">Subjects</a>
+        <a href="Leaderboard.html" class="hover:text-blue-600">Leaderboard</a>
+        <a href="AboutUs.html" class="hover:text-blue-600">About Us</a>
+        <a href="StudentLogin.html" class="px-8 py-3 bg-blue-600 text-white rounded-full font-bold text-lg">Student Portal</a>
+        <a href="AdminLogin.html" class="px-8 py-3 bg-slate-900 text-amber-400 rounded-full font-bold text-lg">Admin Login</a>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var btn = document.getElementById('hamburger-btn');
+            if (btn) btn.onclick = function() {
+                var m = document.getElementById('mobile-menu');
+                m.classList.toggle('hidden');
+                if (!m.classList.contains('hidden')) m.classList.add('flex');
+            };
+        });
+    </script>
+     <section id="view-admin" class="hidden max-w-7xl mx-auto px-4 py-12 fade-in-up">
+
+            <!-- Top bar -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-5 pt-20">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 flex items-center gap-3">
+                        <span class="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-amber-400 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </span>
+                        Admin Dashboard
+                    </h2>
+                    <p class="text-slate-500 mt-1 text-sm">Manage papers, upload questions, and monitor platform activity.</p>
+                </div>
+                <button onclick="adminLogout()" class="flex items-center gap-2 px-5 py-2.5 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-red-50 hover:text-red-600 transition shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Logout
+                </button>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 border-l-4 border-blue-500 shadow-sm">
+                    <p class="text-xs font-bold text-slate-400 uppercase mb-1">Registered Users</p>
+                    <p class="text-3xl font-black text-slate-800">52,481</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 border-l-4 border-emerald-500 shadow-sm">
+                    <p class="text-xs font-bold text-slate-400 uppercase mb-1">Papers in DB</p>
+                    <p id="admin-total-papers" class="text-3xl font-black text-slate-800">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 border-l-4 border-amber-500 shadow-sm">
+                    <p class="text-xs font-bold text-slate-400 uppercase mb-1">Total Questions</p>
+                    <p id="admin-total-q" class="text-3xl font-black text-slate-800">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 border-l-4 border-purple-500 shadow-sm">
+                    <p class="text-xs font-bold text-slate-400 uppercase mb-1">Total Attempts</p>
+                    <p id="admin-total-attempts" class="text-3xl font-black text-slate-800">0</p>
+                </div>
+            </div>
+
+            <!-- Two-column layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                <!-- LEFT: Upload Wizard -->
+                <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+
+                    <!-- Wizard progress bar -->
+                    <div class="bg-slate-50 border-b border-slate-200 px-8 py-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-lg font-extrabold text-slate-900">📄 Upload New Paper Wizard</h3>
+                            <span id="wiz-step-label" class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">Step 1 of 4</span>
+                        </div>
+                        <div class="flex gap-1.5">
+                            <div id="wiz-bar-1" class="h-2 flex-1 rounded-full bg-blue-600 transition-all"></div>
+                            <div id="wiz-bar-2" class="h-2 flex-1 rounded-full bg-slate-200 transition-all"></div>
+                            <div id="wiz-bar-3" class="h-2 flex-1 rounded-full bg-slate-200 transition-all"></div>
+                            <div id="wiz-bar-4" class="h-2 flex-1 rounded-full bg-slate-200 transition-all"></div>
+                        </div>
+                    </div>
+
+                    <div class="p-8">
+
+                        <!-- ── STEP 1: Paper Details ── -->
+                        <div id="wiz-step-1">
+                            <h4 class="text-xl font-extrabold text-slate-800 mb-1">Step 1 — Paper Details</h4>
+                            <p class="text-slate-500 text-sm mb-6">Select the grade, subject, paper type, year and term for this paper.</p>
+
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-bold text-slate-700 mb-1">Grade <span class="text-red-500">*</span></label>
+                                        <select id="wiz-grade" onchange="wizUpdateStream(); wizUpdateSubject();" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-semibold">
+                                            <option value="">— Select Grade —</option>
+                                            <option value="Grade 6">Grade 6</option>
+                                            <option value="Grade 7">Grade 7</option>
+                                            <option value="Grade 8">Grade 8</option>
+                                            <option value="Grade 9">Grade 9</option>
+                                            <option value="Grade 10">Grade 10</option>
+                                            <option value="Grade 11">Grade 11 (O/L)</option>
+                                            <option value="Grade 12">Grade 12 (A/L Year 1)</option>
+                                            <option value="Grade 13">Grade 13 (A/L Year 2)</option>
+                                        </select>
+                                    </div>
+                                    <div id="wiz-stream-wrap" class="hidden">
+                                        <label class="block text-sm font-bold text-slate-700 mb-1">Stream <span class="text-red-500">*</span></label>
+                                        <select id="wiz-stream" onchange="wizUpdateSubject()" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-semibold">
+                                            <option value="Physical Science (Maths)">Physical Science (Maths)</option>
+                                            <option value="Biological Science">Biological Science</option>
+                                            <option value="Commerce">Commerce</option>
+                                            <option value="Arts">Arts</option>
+                                            <option value="Technology">Technology</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold text-slate-700 mb-1">Subject <span class="text-red-500">*</span></label>
+                                        <select id="wiz-subject" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-semibold">
+                                            <option value="">— Select Grade first —</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold text-slate-700 mb-1">Paper Type <span class="text-red-500">*</span></label>
+                                        <select id="wiz-paper-type" onchange="wizToggleTerm()" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-semibold">
+                                            <option value="">— Select Type —</option>
+                                            <option value="National Past Papers">National Past Papers</option>
+                                            <option value="School Term Papers">School Term Papers</option>
+                                            <option value="Provincial Papers">Provincial Papers</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold text-slate-700 mb-1">Examination Year <span class="text-red-500">*</span></label>
+                                        <select id="wiz-year" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-semibold">
+                                            <option value="">— Loading years… —</option>
+                                        </select>
+                                    </div>
+                                    <!-- Term Section — always visible -->
+                                    <div id="wiz-term-wrap" class="md:col-span-2">
+                                        <label class="block text-sm font-bold text-slate-700 mb-2">
+                                            Term
+                                            <span id="wiz-term-required-star" class="text-red-500 hidden"> *</span>
+                                            <span id="wiz-term-optional-badge" class="ml-2 text-[10px] font-bold bg-slate-100 text-slate-400 px-2 py-0.5 rounded-full uppercase tracking-wide">Optional for Past Papers</span>
+                                        </label>
+                                        <div class="grid grid-cols-3 gap-3">
+                                            <!-- 1st Term -->
+                                            <label class="relative flex flex-col items-center gap-2 px-4 py-4 rounded-2xl border-2 border-slate-200 cursor-pointer hover:border-blue-400 transition-all
+                                                          has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 has-[:checked]:shadow-md group">
+                                                <input type="radio" name="wiz-term" value="First Term" class="sr-only">
+                                                <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg font-black group-has-[:checked]:bg-blue-600 group-has-[:checked]:text-white transition-colors">1</div>
+                                                <div class="text-center">
+                                                    <p class="font-extrabold text-slate-800 text-sm leading-tight">1st Term</p>
+                                                    <p class="text-[10px] text-slate-400 font-semibold mt-0.5 uppercase tracking-wide">First Term Test</p>
+                                                </div>
+                                                <div class="absolute top-2 right-2 w-4 h-4 rounded-full border-2 border-slate-300 group-has-[:checked]:border-blue-600 group-has-[:checked]:bg-blue-600 flex items-center justify-center transition-all">
+                                                    <svg class="hidden group-has-[:checked]:block text-white" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                                </div>
+                                            </label>
+                                            <!-- 2nd Term -->
+                                            <label class="relative flex flex-col items-center gap-2 px-4 py-4 rounded-2xl border-2 border-slate-200 cursor-pointer hover:border-emerald-400 transition-all
+                                                          has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50 has-[:checked]:shadow-md group">
+                                                <input type="radio" name="wiz-term" value="Second Term" class="sr-only">
+                                                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg font-black group-has-[:checked]:bg-emerald-600 group-has-[:checked]:text-white transition-colors">2</div>
+                                                <div class="text-center">
+                                                    <p class="font-extrabold text-slate-800 text-sm leading-tight">2nd Term</p>
+                                                    <p class="text-[10px] text-slate-400 font-semibold mt-0.5 uppercase tracking-wide">Second Term Test</p>
+                                                </div>
+                                                <div class="absolute top-2 right-2 w-4 h-4 rounded-full border-2 border-slate-300 group-has-[:checked]:border-emerald-600 group-has-[:checked]:bg-emerald-600 flex items-center justify-center transition-all">
+                                                    <svg class="hidden group-has-[:checked]:block text-white" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                                </div>
+                                            </label>
+                                            <!-- 3rd Term -->
+                                            <label class="relative flex flex-col items-center gap-2 px-4 py-4 rounded-2xl border-2 border-slate-200 cursor-pointer hover:border-amber-400 transition-all
+                                                          has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 has-[:checked]:shadow-md group">
+                                                <input type="radio" name="wiz-term" value="Third Term" class="sr-only">
+                                                <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg font-black group-has-[:checked]:bg-amber-500 group-has-[:checked]:text-white transition-colors">3</div>
+                                                <div class="text-center">
+                                                    <p class="font-extrabold text-slate-800 text-sm leading-tight">3rd Term</p>
+                                                    <p class="text-[10px] text-slate-400 font-semibold mt-0.5 uppercase tracking-wide">Third Term Test</p>
+                                                </div>
+                                                <div class="absolute top-2 right-2 w-4 h-4 rounded-full border-2 border-slate-300 group-has-[:checked]:border-amber-500 group-has-[:checked]:bg-amber-500 flex items-center justify-center transition-all">
+                                                    <svg class="hidden group-has-[:checked]:block text-white" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1">Paper Name <span class="text-red-500">*</span></label>
+                                    <input type="text" id="wiz-paper-name" placeholder="e.g. Royal College 2023 1st Term Science Paper" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-semibold">
+                                </div>
+                                <!-- Time Limit Field -->
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                        Quiz Time Limit
+                                        <span class="text-[10px] font-bold bg-slate-100 text-slate-400 px-2 py-0.5 rounded-full uppercase tracking-wide">Optional</span>
+                                    </label>
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex-1 flex items-center gap-2 bg-slate-50 border-2 border-slate-200 focus-within:border-blue-500 rounded-xl px-4 py-3 transition">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                            <input type="number" id="wiz-time-limit" min="1" max="300" placeholder="e.g. 60" class="w-full bg-transparent outline-none font-bold text-slate-800 placeholder-slate-400">
+                                            <span class="text-sm font-bold text-slate-400 shrink-0">minutes</span>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button type="button" onclick="document.getElementById('wiz-time-limit').value=30" class="px-3 py-2 text-xs font-bold bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition border border-blue-200">30m</button>
+                                            <button type="button" onclick="document.getElementById('wiz-time-limit').value=45" class="px-3 py-2 text-xs font-bold bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition border border-blue-200">45m</button>
+                                            <button type="button" onclick="document.getElementById('wiz-time-limit').value=60" class="px-3 py-2 text-xs font-bold bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition border border-blue-200">60m</button>
+                                            <button type="button" onclick="document.getElementById('wiz-time-limit').value=''" class="px-3 py-2 text-xs font-bold bg-slate-100 text-slate-500 rounded-lg hover:bg-slate-200 transition">No limit</button>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-slate-400 mt-1.5 ml-1">If set, students will see a countdown timer. Quiz auto-submits when time runs out.</p>
+                                </div>
+
+                                <!-- Question Order Setting -->
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                                        Question Order for Students
+                                    </label>
+                                    <div class="flex gap-3">
+                                        <label class="flex-1 relative flex items-center gap-3 px-4 py-3 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-blue-400 transition-all has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 group">
+                                            <input type="radio" name="wiz-shuffle" value="fixed" checked class="sr-only">
+                                            <div class="w-9 h-9 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 group-has-[:checked]:bg-blue-600 group-has-[:checked]:text-white transition-colors">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                                            </div>
+                                            <div>
+                                                <p class="font-extrabold text-slate-800 text-sm">Fixed Order</p>
+                                                <p class="text-[11px] text-slate-400 font-semibold">Same order as you added</p>
+                                            </div>
+                                            <div class="absolute top-2 right-2 w-4 h-4 rounded-full border-2 border-slate-300 group-has-[:checked]:border-blue-600 group-has-[:checked]:bg-blue-600 flex items-center justify-center transition-all">
+                                                <svg class="hidden group-has-[:checked]:block text-white" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                            </div>
+                                        </label>
+                                        <label class="flex-1 relative flex items-center gap-3 px-4 py-3 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-purple-400 transition-all has-[:checked]:border-purple-600 has-[:checked]:bg-purple-50 group">
+                                            <input type="radio" name="wiz-shuffle" value="random" class="sr-only">
+                                            <div class="w-9 h-9 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center shrink-0 group-has-[:checked]:bg-purple-600 group-has-[:checked]:text-white transition-colors">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+                                            </div>
+                                            <div>
+                                                <p class="font-extrabold text-slate-800 text-sm">Random Shuffle</p>
+                                                <p class="text-[11px] text-slate-400 font-semibold">Different order each attempt</p>
+                                            </div>
+                                            <div class="absolute top-2 right-2 w-4 h-4 rounded-full border-2 border-slate-300 group-has-[:checked]:border-purple-600 group-has-[:checked]:bg-purple-600 flex items-center justify-center transition-all">
+                                                <svg class="hidden group-has-[:checked]:block text-white" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <p class="text-xs text-slate-400 mt-1.5 ml-1">Default is <strong>Fixed Order</strong> — questions appear exactly as you added them.</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 flex justify-end">
+                                <button onclick="wizStep1Next()" class="px-8 py-3.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-100 transition flex items-center gap-2">
+                                    Next: Add Questions
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ── STEP 2: Add Questions ── -->
+                        <div id="wiz-step-2" class="hidden">
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <h4 class="text-xl font-extrabold text-slate-800 mb-1">Step 2 — Add Questions</h4>
+                                    <p id="wiz-paper-context" class="text-sm text-blue-700 font-semibold bg-blue-50 px-3 py-1.5 rounded-lg inline-block mt-1"></p>
+                                </div>
+                                <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2 text-center">
+                                    <div id="wiz-q-count" class="text-2xl font-black text-emerald-600">0</div>
+                                    <div class="text-[10px] font-bold text-emerald-500 uppercase">Questions Added</div>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-50 rounded-2xl border border-slate-200 p-6 space-y-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2">Question Text <span class="text-red-500">*</span></label>
+                                    <!-- Rich Text Toolbar -->
+                                    <div id="rte-toolbar" class="flex flex-wrap items-center gap-1 px-3 py-2 bg-white border-2 border-slate-200 rounded-t-xl border-b border-slate-100">
+                                        <!-- Format group -->
+                                        <button type="button" title="Bold" onclick="rteCmd('bold')" class="rte-btn w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition text-slate-700 font-black text-sm">B</button>
+                                        <button type="button" title="Italic" onclick="rteCmd('italic')" class="rte-btn w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition text-slate-600 italic font-semibold text-sm">I</button>
+                                        <button type="button" title="Underline" onclick="rteCmd('underline')" class="rte-btn w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition text-slate-600 underline font-semibold text-sm">U</button>
+                                        <button type="button" title="Strikethrough" onclick="rteCmd('strikeThrough')" class="rte-btn w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition text-slate-500 line-through text-sm font-semibold">S</button>
+                                        <div class="w-px h-6 bg-slate-200 mx-1"></div>
+                                        <!-- Superscript / Subscript -->
+                                        <button type="button" title="Superscript" onclick="rteCmd('superscript')" class="rte-btn w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition text-slate-700 text-xs font-bold">X<sup>2</sup></button>
+                                        <button type="button" title="Subscript" onclick="rteCmd('subscript')" class="rte-btn w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition text-slate-700 text-xs font-bold">X<sub>2</sub></button>
+                                        <div class="w-px h-6 bg-slate-200 mx-1"></div>
+                                        <!-- Alignment -->
+                                        <button type="button" title="Align Left" onclick="rteCmd('justifyLeft')" class="rte-btn w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition text-slate-600">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
+                                        </button>
+                                        <button type="button" title="Align Center" onclick="rteCmd('justifyCenter')" class="rte-btn w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition text-slate-600">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="5" y1="18" x2="19" y2="18"/></svg>
+                                        </button>
+                                        <div class="w-px h-6 bg-slate-200 mx-1"></div>
+                                        <!-- Lists -->
+                                        <button type="button" title="Bullet List" onclick="rteCmd('insertUnorderedList')" class="rte-btn w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition text-slate-600">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg>
+                                        </button>
+                                        <button type="button" title="Numbered List" onclick="rteCmd('insertOrderedList')" class="rte-btn w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition text-slate-600">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><text x="2" y="8" font-size="7" fill="currentColor" stroke="none" font-weight="bold">1</text><text x="2" y="14" font-size="7" fill="currentColor" stroke="none" font-weight="bold">2</text><text x="2" y="20" font-size="7" fill="currentColor" stroke="none" font-weight="bold">3</text></svg>
+                                        </button>
+                                        <div class="w-px h-6 bg-slate-200 mx-1"></div>
+                                        <!-- Indent -->
+                                        <button type="button" title="Indent" onclick="rteCmd('indent')" class="rte-btn w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition text-slate-600">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/><polyline points="7 9 12 12 7 15"/><line x1="3" y1="12" x2="7" y2="12"/></svg>
+                                        </button>
+                                        <button type="button" title="Outdent" onclick="rteCmd('outdent')" class="rte-btn w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition text-slate-600">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/><polyline points="11 9 6 12 11 15"/><line x1="3" y1="12" x2="11" y2="12"/></svg>
+                                        </button>
+                                        <div class="w-px h-6 bg-slate-200 mx-1"></div>
+                                        <!-- Text colour -->
+                                        <label title="Text Colour" class="rte-btn w-8 h-8 rounded-lg flex flex-col items-center justify-center hover:bg-slate-100 transition cursor-pointer relative">
+                                            <span class="font-black text-sm leading-none text-slate-700">A</span>
+                                            <input type="color" id="rte-color-pick" value="#1e3a8a" onchange="rteCmd('foreColor', this.value)" class="absolute opacity-0 w-0 h-0 pointer-events-none">
+                                            <div id="rte-color-bar" class="w-5 h-1 rounded-full bg-blue-800 mt-0.5" onclick="document.getElementById('rte-color-pick').click()"></div>
+                                        </label>
+                                        <div class="w-px h-6 bg-slate-200 mx-1"></div>
+                                        <!-- Undo / Redo -->
+                                        <button type="button" title="Undo" onclick="rteCmd('undo')" class="rte-btn w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition text-slate-600">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+                                        </button>
+                                        <button type="button" title="Redo" onclick="rteCmd('redo')" class="rte-btn w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition text-slate-600">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 1 4-4h12"/></svg>
+                                        </button>
+                                        <div class="w-px h-6 bg-slate-200 mx-1"></div>
+                                        <!-- Clear Formatting -->
+                                        <button type="button" title="Clear Formatting" onclick="rteCmd('removeFormat')" class="rte-btn w-8 h-8 rounded-lg flex items-center justify-center hover:bg-red-50 transition text-slate-400 hover:text-red-500">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+                                        </button>
+                                        <div class="w-px h-6 bg-slate-200 mx-1"></div>
+                                        <!-- ═══ MATH TOOLBAR ═══ -->
+                                        <!-- Toggle math panel button -->
+                                        <button type="button" title="Math Functions" onclick="toggleMathPanel()" id="math-panel-toggle"
+                                            class="rte-btn flex items-center gap-1 px-2 h-8 rounded-lg hover:bg-violet-50 transition text-violet-700 font-black text-xs border border-violet-200 bg-violet-50">
+                                            ∑ Math
+                                        </button>
+                                    </div>
+                                    <!-- ═══════════════════════════════════════════
+                                         MATH PANEL — hidden by default
+                                    ════════════════════════════════════════════ -->
+                                    <div id="math-panel" class="hidden bg-violet-50 border-2 border-violet-200 border-t-0 rounded-b-none px-3 py-2 flex flex-wrap gap-1 items-center">
+                                        <!-- BASIC -->
+                                        <span class="text-[10px] font-black text-violet-400 uppercase tracking-wide mr-1">Basic</span>
+                                        <button type="button" title="Fraction" onclick="insertMath('\\frac{a}{b}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">a/b</button>
+                                        <button type="button" title="Square Root" onclick="insertMath('\\sqrt{x}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">√x</button>
+                                        <button type="button" title="nth Root" onclick="insertMath('\\sqrt[n]{x}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">ⁿ√x</button>
+                                        <button type="button" title="Power" onclick="insertMath('x^{n}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">xⁿ</button>
+                                        <button type="button" title="Subscript" onclick="insertMath('x_{n}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">xₙ</button>
+                                        <button type="button" title="x squared" onclick="insertMath('x^{2}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">x²</button>
+                                        <button type="button" title="x cubed" onclick="insertMath('x^{3}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">x³</button>
+                                        <button type="button" title="Absolute value" onclick="insertMath('|x|')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">|x|</button>
+                                        <div class="w-px h-6 bg-violet-200 mx-1"></div>
+                                        <!-- ALGEBRA -->
+                                        <span class="text-[10px] font-black text-violet-400 uppercase tracking-wide mr-1">Algebra</span>
+                                        <button type="button" title="Plus-minus" onclick="insertMath('\\pm')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">±</button>
+                                        <button type="button" title="Not equal" onclick="insertMath('\\neq')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">≠</button>
+                                        <button type="button" title="Less or equal" onclick="insertMath('\\leq')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">≤</button>
+                                        <button type="button" title="Greater or equal" onclick="insertMath('\\geq')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">≥</button>
+                                        <button type="button" title="Approximately equal" onclick="insertMath('\\approx')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">≈</button>
+                                        <button type="button" title="Infinity" onclick="insertMath('\\infty')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">∞</button>
+                                        <button type="button" title="Summation" onclick="insertMath('\\sum_{i=1}^{n}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">∑</button>
+                                        <button type="button" title="Product" onclick="insertMath('\\prod_{i=1}^{n}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">∏</button>
+                                        <div class="w-px h-6 bg-violet-200 mx-1"></div>
+                                        <!-- CALCULUS -->
+                                        <span class="text-[10px] font-black text-violet-400 uppercase tracking-wide mr-1">Calculus</span>
+                                        <button type="button" title="Integral" onclick="insertMath('\\int_{a}^{b}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">∫</button>
+                                        <button type="button" title="Double integral" onclick="insertMath('\\iint')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">∬</button>
+                                        <button type="button" title="Contour integral" onclick="insertMath('\\oint')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">∮</button>
+                                        <button type="button" title="Limit" onclick="insertMath('\\lim_{x \\to 0}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">lim</button>
+                                        <button type="button" title="Derivative" onclick="insertMath('\\frac{dy}{dx}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">dy/dx</button>
+                                        <button type="button" title="Partial derivative" onclick="insertMath('\\frac{\\partial f}{\\partial x}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">∂f/∂x</button>
+                                        <button type="button" title="Second derivative" onclick="insertMath('\\frac{d^{2}y}{dx^{2}}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">d²y/dx²</button>
+                                        <div class="w-px h-6 bg-violet-200 mx-1"></div>
+                                        <!-- GREEK -->
+                                        <span class="text-[10px] font-black text-violet-400 uppercase tracking-wide mr-1">Greek</span>
+                                        <button type="button" onclick="insertMath('\\alpha')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">α</button>
+                                        <button type="button" onclick="insertMath('\\beta')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">β</button>
+                                        <button type="button" onclick="insertMath('\\gamma')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">γ</button>
+                                        <button type="button" onclick="insertMath('\\delta')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">δ</button>
+                                        <button type="button" onclick="insertMath('\\theta')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">θ</button>
+                                        <button type="button" onclick="insertMath('\\lambda')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">λ</button>
+                                        <button type="button" onclick="insertMath('\\mu')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">μ</button>
+                                        <button type="button" onclick="insertMath('\\pi')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">π</button>
+                                        <button type="button" onclick="insertMath('\\sigma')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">σ</button>
+                                        <button type="button" onclick="insertMath('\\omega')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">ω</button>
+                                        <button type="button" onclick="insertMath('\\Delta')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">Δ</button>
+                                        <button type="button" onclick="insertMath('\\Sigma')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">Σ</button>
+                                        <div class="w-px h-6 bg-violet-200 mx-1"></div>
+                                        <!-- TRIG -->
+                                        <span class="text-[10px] font-black text-violet-400 uppercase tracking-wide mr-1">Trig</span>
+                                        <button type="button" onclick="insertMath('\\sin(x)')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">sin</button>
+                                        <button type="button" onclick="insertMath('\\cos(x)')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">cos</button>
+                                        <button type="button" onclick="insertMath('\\tan(x)')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">tan</button>
+                                        <button type="button" onclick="insertMath('\\sin^{-1}(x)')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">sin⁻¹</button>
+                                        <button type="button" onclick="insertMath('\\cos^{-1}(x)')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">cos⁻¹</button>
+                                        <button type="button" onclick="insertMath('\\tan^{-1}(x)')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">tan⁻¹</button>
+                                        <div class="w-px h-6 bg-violet-200 mx-1"></div>
+                                        <!-- LOGS / EXP -->
+                                        <span class="text-[10px] font-black text-violet-400 uppercase tracking-wide mr-1">Log/Exp</span>
+                                        <button type="button" onclick="insertMath('\\log(x)')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">log</button>
+                                        <button type="button" onclick="insertMath('\\log_{b}(x)')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">logₓ</button>
+                                        <button type="button" onclick="insertMath('\\ln(x)')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">ln</button>
+                                        <button type="button" onclick="insertMath('e^{x}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">eˣ</button>
+                                        <div class="w-px h-6 bg-violet-200 mx-1"></div>
+                                        <!-- ADVANCED / MATRICES -->
+                                        <span class="text-[10px] font-black text-violet-400 uppercase tracking-wide mr-1">Advanced</span>
+                                        <button type="button" title="Matrix 2x2" onclick="insertMath('\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">[ ]</button>
+                                        <button type="button" title="Determinant" onclick="insertMath('\\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">| |</button>
+                                        <button type="button" title="Binomial coefficient" onclick="insertMath('\\binom{n}{r}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">C(n,r)</button>
+                                        <button type="button" title="Factorial" onclick="insertMath('n!')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">n!</button>
+                                        <button type="button" title="Vector" onclick="insertMath('\\vec{v}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">⃗v</button>
+                                        <button type="button" title="Dot product" onclick="insertMath('\\cdot')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">·</button>
+                                        <button type="button" title="Cross product" onclick="insertMath('\\times')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">×</button>
+                                        <button type="button" title="Piecewise function" onclick="insertMath('\\begin{cases} a & x > 0 \\\\ b & x \\leq 0 \\end{cases}')" class="math-btn px-2 py-1 rounded text-sm font-bold bg-white border border-violet-200 hover:bg-violet-100 text-slate-700">{cases}</button>
+                                        <div class="w-px h-6 bg-violet-200 mx-1"></div>
+                                        <!-- DISPLAY MODE WRAP -->
+                                        <span class="text-[10px] font-black text-violet-400 uppercase tracking-wide mr-1">Wrap</span>
+                                        <button type="button" title="Inline math: $...$" onclick="wrapMathInline()" class="math-btn px-2 py-1 rounded text-sm font-bold bg-violet-100 border border-violet-300 hover:bg-violet-200 text-violet-800">$…$</button>
+                                        <button type="button" title="Display math: $$...$$" onclick="wrapMathDisplay()" class="math-btn px-2 py-1 rounded text-sm font-bold bg-violet-100 border border-violet-300 hover:bg-violet-200 text-violet-800">$$…$$</button>
+                                        <button type="button" title="Close math panel" onclick="toggleMathPanel()" class="ml-1 px-2 py-1 rounded text-xs font-bold bg-red-50 border border-red-200 text-red-500 hover:bg-red-100">✕ Close</button>
+                                    </div>
+                                    <!-- Contenteditable editor (replaces textarea) -->
+                                    <div id="wiz-q-text"
+                                         contenteditable="true"
+                                         data-placeholder="ප්‍රශ්නය මෙහි ටයිප් කරන්න... (Type the MCQ question here)"
+                                         class="sinhala-text w-full min-h-[90px] px-4 py-3 bg-white border-2 border-slate-200 border-t-0 rounded-b-xl focus:outline-none focus:border-blue-500 font-medium text-slate-800 transition"
+                                         style="font-size:15px; line-height:1.7;"
+                                         oninput="rteUpdateToolbar()"
+                                         onkeyup="rteUpdateToolbar()"
+                                         onmouseup="rteUpdateToolbar()">
+                                    </div>
+                                    <style>
+                                        #wiz-q-text:empty:before {
+                                            content: attr(data-placeholder);
+                                            color: #94a3b8;
+                                            pointer-events: none;
+                                        }
+                                        .rte-btn.active { background-color: #dbeafe; color: #1d4ed8; }
+                                        #rte-toolbar { border-bottom: 1px solid #e2e8f0; }
+                                        #math-panel { border-top: none; }
+                                        /* Math panel: show rounded-bottom only when editor follows */
+                                        #math-panel:not(.hidden) + #wiz-q-text { border-top: 0; }
+                                        .math-btn { transition: background 0.15s; font-size:13px; }
+                                    </style>
+                                </div>
+
+                                <!-- Optional Image Upload -->
+                                <div class="bg-white border-2 border-dashed border-slate-200 rounded-xl p-4">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <label class="text-sm font-bold text-slate-700 flex items-center gap-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                            Question Image <span class="text-xs font-normal text-slate-400 ml-1">(Optional)</span>
+                                        </label>
+                                        <button type="button" id="wiz-img-clear-btn" onclick="wizClearImage()" class="hidden text-xs text-red-500 hover:text-red-700 font-bold flex items-center gap-1 transition">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                            Remove
+                                        </button>
+                                    </div>
+                                    <div id="wiz-img-drop-zone" onclick="document.getElementById('wiz-img-input').click()"
+                                         class="flex flex-col items-center justify-center gap-2 py-5 cursor-pointer rounded-xl hover:bg-slate-50 transition text-slate-400 text-sm font-medium">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                        <span>Click to upload image <span class="text-blue-500 font-bold">(PNG, JPG, GIF)</span></span>
+                                        <span class="text-xs text-slate-300">Max 2 MB — stored as base64</span>
+                                    </div>
+                                    <img id="wiz-img-preview" src="" alt="Preview" class="hidden w-full max-h-48 object-contain rounded-xl border border-slate-200 mt-2 bg-white">
+                                    <input type="file" id="wiz-img-input" accept="image/*" class="hidden" onchange="wizHandleImageUpload(event)">
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="wiz-options-grid">
+                                    <div class="relative">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg bg-blue-100 text-blue-700 text-xs font-black flex items-center justify-center">A</span>
+                                        <input type="text" id="wiz-opt-0" placeholder="Option A  — use \( \LaTeX \) for math" class="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-medium">
+                                    </div>
+                                    <div class="relative">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 text-xs font-black flex items-center justify-center">B</span>
+                                        <input type="text" id="wiz-opt-1" placeholder="Option B  — use \( \LaTeX \) for math" class="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-medium">
+                                    </div>
+                                    <div class="relative">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg bg-amber-100 text-amber-700 text-xs font-black flex items-center justify-center">C</span>
+                                        <input type="text" id="wiz-opt-2" placeholder="Option C  — use \( \LaTeX \) for math" class="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-medium">
+                                    </div>
+                                    <div class="relative">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg bg-rose-100 text-rose-700 text-xs font-black flex items-center justify-center">D</span>
+                                        <input type="text" id="wiz-opt-3" placeholder="Option D  — use \( \LaTeX \) for math" class="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-medium">
+                                    </div>
+                                    <!-- Option E (hidden by default) -->
+                                    <div id="wiz-opt-e-wrap" class="relative hidden md:col-span-2">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg bg-purple-100 text-purple-700 text-xs font-black flex items-center justify-center">E</span>
+                                        <input type="text" id="wiz-opt-4" placeholder="Option E  — use \( \LaTeX \) for math" class="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-purple-500 outline-none font-medium">
+                                    </div>
+                                </div>
+                                <!-- Math quick-insert for answers -->
+                                <div class="bg-violet-50 border border-violet-200 rounded-xl px-4 py-2.5 flex flex-wrap items-center gap-2">
+                                    <span class="text-[10px] font-black text-violet-500 uppercase tracking-wide shrink-0">Quick Math for Answers:</span>
+                                    <select id="ans-math-pick" class="text-xs font-bold bg-white border border-violet-200 rounded-lg px-2 py-1 text-slate-700 outline-none">
+                                        <option value="">— pick template —</option>
+                                        <optgroup label="Basic">
+                                            <option value="\\frac{a}{b}">Fraction a/b</option>
+                                            <option value="\\sqrt{x}">Square root √x</option>
+                                            <option value="\\sqrt[n]{x}">nth root</option>
+                                            <option value="x^{2}">x²</option>
+                                            <option value="x^{3}">x³</option>
+                                            <option value="x^{n}">xⁿ</option>
+                                            <option value="x_{n}">xₙ</option>
+                                        </optgroup>
+                                        <optgroup label="Algebra">
+                                            <option value="\\pm">±</option>
+                                            <option value="\\infty">∞</option>
+                                            <option value="\\leq">≤</option>
+                                            <option value="\\geq">≥</option>
+                                            <option value="\\neq">≠</option>
+                                            <option value="\\approx">≈</option>
+                                        </optgroup>
+                                        <optgroup label="Calculus">
+                                            <option value="\\int_{a}^{b}">Integral ∫</option>
+                                            <option value="\\lim_{x \\to 0}">Limit</option>
+                                            <option value="\\frac{dy}{dx}">dy/dx</option>
+                                            <option value="x^{2} + C">x² + C</option>
+                                        </optgroup>
+                                        <optgroup label="Greek">
+                                            <option value="\\alpha">α</option>
+                                            <option value="\\beta">β</option>
+                                            <option value="\\pi">π</option>
+                                            <option value="\\theta">θ</option>
+                                            <option value="\\lambda">λ</option>
+                                            <option value="\\sigma">σ</option>
+                                        </optgroup>
+                                        <optgroup label="Trig / Log">
+                                            <option value="\\sin(x)">sin(x)</option>
+                                            <option value="\\cos(x)">cos(x)</option>
+                                            <option value="\\tan(x)">tan(x)</option>
+                                            <option value="\\log(x)">log(x)</option>
+                                            <option value="\\ln(x)">ln(x)</option>
+                                            <option value="e^{x}">eˣ</option>
+                                        </optgroup>
+                                    </select>
+                                    <select id="ans-target-pick" class="text-xs font-bold bg-white border border-violet-200 rounded-lg px-2 py-1 text-slate-700 outline-none">
+                                        <option value="0">→ Option A</option>
+                                        <option value="1">→ Option B</option>
+                                        <option value="2">→ Option C</option>
+                                        <option value="3">→ Option D</option>
+                                        <option value="4">→ Option E</option>
+                                    </select>
+                                    <button type="button" onclick="insertMathToOption()" class="px-3 py-1 text-xs font-black bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition">Insert ∑</button>
+                                    <span class="text-[10px] text-slate-400">Or type <code class="bg-white px-1 rounded border border-slate-200">\( ... \)</code> directly in the option field</span>
+                                </div>
+
+                                <!-- Add / Remove Option E button -->
+                                <div class="flex items-center gap-3">
+                                    <button type="button" id="wiz-toggle-e-btn" onclick="wizToggleOptionE()" class="flex items-center gap-2 px-4 py-2 text-xs font-bold text-purple-600 bg-purple-50 border border-purple-200 rounded-xl hover:bg-purple-100 transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                                        Add Option E
+                                    </button>
+                                    <span class="text-xs text-slate-400">Some papers use 5-choice MCQs</span>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-sm font-bold text-slate-700 mb-1">Correct Answer <span class="text-red-500">*</span></label>
+                                        <select id="wiz-correct" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-emerald-500 outline-none font-bold text-emerald-700">
+                                            <option value="0">✅ Option A</option>
+                                            <option value="1">✅ Option B</option>
+                                            <option value="2">✅ Option C</option>
+                                            <option value="3">✅ Option D</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold text-slate-700 mb-1">Explanation (Optional)</label>
+                                        <input type="text" id="wiz-explanation" placeholder="Why is this the correct answer?" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-medium">
+                                    </div>
+                                </div>
+                                <button onclick="wizAddQuestion()" class="w-full py-3.5 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-100">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                                    Add This Question
+                                </button>
+                            </div>
+
+                            <!-- Added questions mini-list -->
+                            <div id="wiz-q-list" class="mt-4 space-y-2 max-h-60 overflow-y-auto"></div>
+
+                            <div class="mt-6 flex justify-between">
+                                <button onclick="wizGoStep(1)" class="px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+                                    Back
+                                </button>
+                                <button onclick="wizStep2Next()" class="px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition flex items-center gap-2 shadow-lg shadow-blue-100">
+                                    Next: Review
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ── STEP 3: Review ── -->
+                        <div id="wiz-step-3" class="hidden">
+                            <h4 class="text-xl font-extrabold text-slate-800 mb-1">Step 3 — Review Paper</h4>
+                            <p class="text-slate-500 text-sm mb-6">Check all details before publishing to the student database.</p>
+
+                            <div id="wiz-review-content" class="space-y-4"></div>
+
+                            <div class="mt-6 flex justify-between">
+                                <button onclick="wizGoStep(2)" class="px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+                                    Back
+                                </button>
+                                <button onclick="wizPublish()" class="px-8 py-3.5 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition flex items-center gap-2 shadow-lg shadow-emerald-100">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    Publish Paper to Database
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ── STEP 4: Success ── -->
+                        <div id="wiz-step-4" class="hidden text-center py-8">
+                            <div class="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="text-emerald-600" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            </div>
+                            <h4 class="text-2xl font-extrabold text-slate-900 mb-2">Paper Published! 🎉</h4>
+                            <p id="wiz-success-msg" class="text-slate-500 mb-8"></p>
+                            <div class="flex gap-4 justify-center">
+                                <button onclick="wizReset()" class="px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition">
+                                    Upload Another Paper
+                                </button>
+                                <button onclick="wizViewPublished()" class="px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition">
+                                    View Published Papers
+                                </button>
+                            </div>
+                        </div>
+
+                    </div><!-- /p-8 -->
+                </div><!-- /wizard card -->
+
+                <!-- RIGHT SIDEBAR -->
+                <div class="space-y-5">
+
+                    <!-- Published Papers Panel -->
+                    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                            <h4 class="font-extrabold text-slate-800">Published Papers</h4>
+                            <span id="published-count" class="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">0</span>
+                        </div>
+                        <div id="published-papers-list" class="divide-y divide-slate-100 max-h-72 overflow-y-auto">
+                            <p class="text-sm text-slate-400 text-center py-6">No papers published yet.</p>
+                        </div>
+                    </div>
+
+                    <!-- ── Manage Exam Years ── -->
+                    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-violet-100 text-violet-600 flex items-center justify-center shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-extrabold text-slate-800 text-sm">Manage Exam Years</h4>
+                                <p class="text-[10px] text-slate-400 font-semibold">2015–2025 built-in · add extras below</p>
+                            </div>
+                        </div>
+                        <div class="p-4 space-y-3">
+                            <!-- Add year row -->
+                            <div class="flex gap-2">
+                                <input id="admin-new-year" type="number" min="1990" max="2099" placeholder="e.g. 2025"
+                                    class="flex-1 px-3 py-2.5 rounded-xl border-2 border-slate-200 focus:border-violet-500 outline-none font-bold text-slate-800 text-sm placeholder-slate-300 transition">
+                                <button onclick="adminAddYear()" class="shrink-0 px-4 py-2.5 bg-violet-600 text-white text-xs font-bold rounded-xl hover:bg-violet-700 transition flex items-center gap-1.5 shadow shadow-violet-100">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    Add
+                                </button>
+                            </div>
+                            <!-- Year chips -->
+                            <div id="admin-years-loading" class="flex items-center gap-2 text-xs text-slate-400 py-1">
+                                <div class="w-4 h-4 border-2 border-violet-200 border-t-violet-500 rounded-full animate-spin"></div>
+                                Loading years…
+                            </div>
+                            <div id="admin-years-chips" class="hidden flex flex-wrap gap-2 max-h-40 overflow-y-auto"></div>
+                            <p id="admin-years-empty" class="hidden text-xs text-slate-400 text-center py-2">No years added yet. Add one above.</p>
+                            <p class="text-[10px] text-slate-400 leading-relaxed mt-1">Years 2015–2025 are always available in the wizard. Add extra years (e.g. <span class="font-bold text-violet-600">2026</span>) here — they appear <span class="font-bold">only in the Upload Wizard</span>. Students see a year only after you publish a paper for it.</p>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-3">
+                        <h4 class="font-extrabold text-slate-800 mb-2">Quick Actions</h4>
+                        <div class="p-4 rounded-xl border border-slate-100 hover:border-blue-300 cursor-pointer transition group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-100 transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                                </div>
+                                <div><p class="font-bold text-slate-800 text-sm">Manage Students</p><p class="text-xs text-slate-400">View progress & accounts</p></div>
+                            </div>
+                        </div>
+                        <div class="p-4 rounded-xl border border-slate-100 hover:border-amber-300 cursor-pointer transition group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center group-hover:bg-amber-100 transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                </div>
+                                <div><p class="font-bold text-slate-800 text-sm">Reported Questions</p><p class="text-xs text-slate-400">Review flagged items</p></div>
+                            </div>
+                        </div>
+                        <div class="p-4 rounded-xl border border-slate-100 hover:border-slate-300 cursor-pointer transition group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-lg bg-slate-50 text-slate-600 flex items-center justify-center group-hover:bg-slate-100 transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+                                </div>
+                                <div><p class="font-bold text-slate-800 text-sm">System Settings</p><p class="text-xs text-slate-400">Configure platform</p></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /sidebar -->
+            </div><!-- /grid -->
+        </section>
+
+        <section id="view-stream" class="hidden max-w-7xl mx-auto px-4 py-20 fade-in-up">
+            <div class="mb-10">
+                <button onclick="navTo('home')" class="flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold mb-6 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    Back to Grades
+                </button>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900">Advanced Level Streams</h2>
+                <p class="text-slate-500 mt-2">Select your academic stream for Grade <span id="stream-grade-display"></span>.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div onclick="selectStream('Physical Science (Maths)')" class="hover-card grad-maths p-8 rounded-3xl cursor-pointer">
+                    <div class="text-4xl mb-4">📐</div>
+                    <h3 class="text-xl font-bold text-slate-900">Physical Science</h3>
+                    <p class="text-sm text-slate-600 mt-1">Combined Mathematics, Physics, Chemistry / ICT</p>
+                </div>
+                <div onclick="selectStream('Biological Science')" class="hover-card grad-bio p-8 rounded-3xl cursor-pointer">
+                    <div class="text-4xl mb-4">🧬</div>
+                    <h3 class="text-xl font-bold text-slate-900">Biological Science</h3>
+                    <p class="text-sm text-slate-600 mt-1">Biology, Physics, Chemistry / Agriculture</p>
+                </div>
+                <div onclick="selectStream('Commerce')" class="hover-card grad-com p-8 rounded-3xl cursor-pointer">
+                    <div class="text-4xl mb-4">📊</div>
+                    <h3 class="text-xl font-bold text-slate-900">Commerce</h3>
+                    <p class="text-sm text-slate-600 mt-1">Accounting, Business Studies, Economics</p>
+                </div>
+                <div onclick="selectStream('Arts')" class="hover-card grad-arts p-8 rounded-3xl cursor-pointer">
+                    <div class="text-4xl mb-4">🎨</div>
+                    <h3 class="text-xl font-bold text-slate-900">Arts & Humanities</h3>
+                    <p class="text-sm text-slate-600 mt-1">Languages, Logic, Geography, History</p>
+                </div>
+                <div onclick="selectStream('Technology')" class="hover-card grad-tech p-8 rounded-3xl cursor-pointer">
+                    <div class="text-4xl mb-4">⚙️</div>
+                    <h3 class="text-xl font-bold text-slate-900">Technology</h3>
+                    <p class="text-sm text-slate-600 mt-1">ET / BST / SFT / ICT</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-subjects" class="hidden max-w-7xl mx-auto px-4 py-20 fade-in-up">
+            <div class="mb-10">
+                <button id="subjects-back-btn" onclick="goBackFromSubjects()" class="flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold mb-6 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    Back
+                </button>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900">Select Subject</h2>
+                <p id="subject-meta-subtitle" class="text-slate-500 mt-2 font-medium"></p>
+            </div>
+            
+            <div id="subjects-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                </div>
+        </section>
+
+        <section id="view-papers" class="hidden max-w-7xl mx-auto px-4 py-20 fade-in-up">
+            <div class="mb-10">
+                <button onclick="goBackFromPapers()" class="flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold mb-6 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    Back to Subjects
+                </button>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900">Select Paper Category</h2>
+                <p id="paper-meta-subtitle" class="text-slate-500 mt-2 font-medium"></p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8">
+                <div onclick="selectPaper('National Past Papers')" class="hover-card p-6 sm:p-10 rounded-2xl sm:rounded-3xl cursor-pointer text-center">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4 sm:mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 sm:mb-3 text-slate-800">Past Papers</h3>
+                    <p class="text-slate-500 text-sm">Official Dept of Examination papers (2015-2023).</p>
+                </div>
+                <div onclick="selectPaper('School Term Papers')" class="hover-card p-6 sm:p-10 rounded-2xl sm:rounded-3xl cursor-pointer text-center">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mb-4 sm:mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 10 9-10 9-10-9 10-9z"/><path d="m2 12 10 9 10-9"/></svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 sm:mb-3 text-slate-800">School Papers</h3>
+                    <p class="text-slate-500 text-sm">Curated papers from Royal, Ananda, and Visakha.</p>
+                </div>
+                <div onclick="selectPaper('Provincial Papers')" class="hover-card p-6 sm:p-10 rounded-2xl sm:rounded-3xl cursor-pointer text-center">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mb-4 sm:mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 sm:mb-3 text-slate-800">Provincial</h3>
+                    <p class="text-slate-500 text-sm">Tests from Western, Central, and Southern provinces.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-quiz" class="hidden max-w-4xl mx-auto px-4 py-12 fade-in-up">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div>
+                    <button onclick="goBackFromQuiz()" class="flex items-center gap-1 text-blue-600 font-bold mb-2 text-sm hover:underline">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            Back to Papers
+        </button>
+           
+                    <h2 id="quiz-title" class="font-extrabold text-slate-900 uppercase tracking-tight" style="font-size:clamp(20px,3vw,24px);"></h2>
+                    <p id="quiz-meta" class="text-sm text-slate-500 font-medium"></p>
+                </div>
+                <div class="bg-slate-50 px-6 py-3 rounded-xl flex items-center gap-3 border border-slate-200">
+                    <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                    <span id="timer" class="font-mono font-bold text-xl text-slate-800">00:00</span>
+                </div>
+            </div>
+
+
+
+
+       <footer class="bg-slate-900 text-slate-400 py-12 mt-auto border-t-4 border-blue-600">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="col-span-1 md:col-span-2">
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="w-8 h-8 rounded bg-blue-600 flex items-center justify-center text-white font-bold">S</div>
+                    <h2 class="text-xl font-extrabold text-white tracking-widest">SAHASRA</h2>
+                </div>
+                <p class="text-sm mb-6 max-w-sm">Sri Lanka's most comprehensive online examination platform. Designed for students to excel in O/L and A/L examinations with real-time analytics and secure progress tracking.</p>
+                <p class="text-xs">© 2026 Sahasra Education. All rights reserved.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-sm">Quick Links</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="index.html" class="hover:text-blue-400 transition">Home</a></li>
+                    <li><a href="Subject.html" class="hover:text-blue-400 transition">Subjects</a></li>
+                    <li><a href="Leaderboard.html" class="hover:text-blue-400 transition">Student Leaderboard</a></li>
+                    <li><a href="AboutUs.html" class="hover:text-blue-400 transition">About Us</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-sm">Administration</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="AdminLogin.html" class="hover:text-amber-400 transition flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        Admin Secure Login</a></li>
+                    <li><a href="AdminDashboard.html" class="hover:text-amber-400 transition flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                        Paper Management</a></li>
+                    <li><a href="StudentDashboard.html" class="hover:text-amber-400 transition flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                        Student Dashboard</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <div id="auth-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative fade-in-up my-8">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            
+            <div class="text-center mb-6">
+                <div id="modal-icon" class="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold mx-auto mb-4">S</div>
+                <h3 id="modal-title" class="text-2xl font-extrabold text-slate-900">Student Portal</h3>
+                <p id="modal-subtitle" class="text-sm text-slate-500 mt-1 flex items-center justify-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    256-bit Encrypted Connection
+                </p>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <form id="form-login" onsubmit="event.preventDefault(); studentLogin();" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Email Address</label>
+                    <input type="email" id="login-email" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition" placeholder="your@email.com" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Password</label>
+                    <input type="password" id="login-pass" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition" placeholder="••••••••" required>
+                </div>
+                <p id="login-error" class="text-red-500 text-sm hidden"></p>
+                <button type="submit" id="login-btn" class="w-full py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition mt-4">
+                    Secure Login
+                </button>
+                <div class="mt-6 text-center text-sm text-slate-500">
+                    Don't have an account? <button type="button" onclick="switchModalMode('register')" class="text-blue-600 font-bold hover:underline">Register Here</button>
+                </div>
+            </form>
+            <!-- REGISTER FORM -->
+            <form id="form-register" onsubmit="event.preventDefault(); studentRegister();" class="space-y-4 hidden">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">Full Name <span class="text-red-500">*</span></label>
+                        <input type="text" id="reg-name" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition" placeholder="Your full name" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">Grade <span class="text-red-500">*</span></label>
+                        <select id="reg-grade" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 outline-none font-semibold" required>
+                            <option value="">— Grade —</option>
+                            <option>Grade 6</option><option>Grade 7</option><option>Grade 8</option>
+                            <option>Grade 9</option><option>Grade 10</option><option>Grade 11</option>
+                            <option>Grade 12</option><option>Grade 13</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">School Name</label>
+                    <input type="text" id="reg-school" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition" placeholder="e.g. Royal College, Colombo">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Email Address <span class="text-red-500">*</span></label>
+                    <input type="email" id="reg-email" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition" placeholder="your@email.com" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Password <span class="text-red-500">*</span></label>
+                    <input type="password" id="reg-pass" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition" placeholder="Min 6 characters" required minlength="6">
+                </div>
+                <p id="reg-error" class="text-red-500 text-sm hidden"></p>
+                <button type="submit" id="reg-btn" class="w-full py-4 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-200 transition mt-2">
+                    Create My Account
+                </button>
+                <div class="mt-4 text-center text-sm text-slate-500">
+                    Already have an account? <button type="button" onclick="switchModalMode('login')" class="text-blue-600 font-bold hover:underline">Login Here</button>
+                </div>
+            </form>
+
+            <form id="form-admin" onsubmit="event.preventDefault(); loginAdmin();" class="space-y-4 hidden">
+                <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-xs text-amber-800 font-semibold flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Sign in with your Firebase admin email account
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Admin Email</label>
+                    <input type="email" id="admin-email" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-100 outline-none transition" placeholder="admin@youremail.com" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Password</label>
+                    <input type="password" id="admin-pass" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-100 outline-none transition" placeholder="••••••••" required>
+                </div>
+                <p id="admin-error" class="text-red-500 text-sm hidden"></p>
+                <button type="submit" id="admin-btn" class="w-full py-4 bg-slate-900 text-amber-400 font-bold rounded-xl hover:bg-slate-800 shadow-lg shadow-slate-200 transition mt-4">
+                    Access Admin Dashboard
+                </button>
+                <div class="mt-6 text-center text-sm text-slate-500">
+                    Student? <button type="button" onclick="switchModalMode('login')" class="text-blue-600 font-bold hover:underline">Return to Student Portal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         EDIT QUIZ MODAL (Admin)
+    ═══════════════════════════════════════════════════════════ -->
+
+    <div id="edit-quiz-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[210] hidden flex items-start justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl w-full max-w-3xl shadow-2xl relative fade-in-up my-8">
+            <div class="flex items-center gap-3 px-8 pt-8 pb-5 border-b border-slate-100 pr-16">
+                <div class="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-white shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </div>
+                <div>
+                    <h3 id="edit-modal-title" class="text-lg font-extrabold text-slate-900">Edit Quiz</h3>
+                    <p class="text-xs text-slate-400">Admin — Edit paper details and questions</p>
+                </div>
+            </div>
+            <button onclick="closeEditModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 transition p-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <div class="p-8 space-y-6">
+                <div class="bg-blue-50 border border-blue-100 rounded-2xl p-5">
+                    <h4 class="font-extrabold text-blue-900 mb-4 text-sm flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                        Paper Details
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Paper Name</label>
+                            <input id="edit-paper-name" type="text" class="w-full px-3 py-2.5 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-semibold text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Time Limit (minutes)</label>
+                            <div class="flex items-center gap-2">
+                                <input id="edit-time-limit" type="number" min="1" max="300" placeholder="No limit" class="w-full px-3 py-2.5 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-semibold text-sm">
+                                <button type="button" onclick="document.getElementById('edit-time-limit').value=''" class="shrink-0 px-3 py-2 text-xs font-bold bg-slate-100 text-slate-500 rounded-lg hover:bg-slate-200 transition">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-extrabold text-slate-800 text-sm">Questions</h4>
+                        <span id="edit-q-count-badge" class="text-xs font-bold bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full">0 questions</span>
+                    </div>
+                    <div id="edit-questions-loading" class="text-center py-10 text-slate-400 text-sm">
+                        <div class="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-3"></div>
+                        Loading questions from Firebase…
+                    </div>
+                    <div id="edit-questions-list" class="hidden space-y-3 max-h-[52vh] overflow-y-auto pr-1"></div>
+                </div>
+                <div class="flex justify-end gap-3 pt-2 border-t border-slate-100">
+                    <button onclick="closeEditModal()" class="px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition text-sm">Cancel</button>
+                    <button id="edit-save-btn" onclick="saveEditedQuiz()" class="px-8 py-3 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600 transition text-sm flex items-center gap-2 shadow-lg shadow-amber-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         PAPER RESULTS MODAL (Admin)
+    ═══════════════════════════════════════════════════════════ -->
+
+    <div id="paper-results-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl relative fade-in-up my-8">
+            <button onclick="document.getElementById('paper-results-modal').classList.add('hidden')"
+                class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <div class="flex items-center gap-3 mb-6 pr-8">
+                <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-extrabold text-slate-900">Paper Results & Student Activity</h3>
+                    <p class="text-xs text-slate-400">Admin View — All student submissions for this paper</p>
+                </div>
+            </div>
+            <div id="paper-results-content"></div>
+        </div>
+    </div>
+
+
+    <script src="script.js"></script>
+</body>
+</html>

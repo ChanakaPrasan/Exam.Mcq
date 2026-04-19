@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Available Papers | Sahasra</title>
+    <meta name="description" id="page-desc" content="Browse and select from available MCQ papers on Sahasra.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title"       content="Available Papers | Sahasra">
+    <meta property="og:description" content="Select a paper to start your MCQ practice session on Sahasra.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey:"AIzaSyARM8N5EINxpbn9ucxK1bWOe4RDm5_z_FU",
+            authDomain:"mcq--lk.firebaseapp.com", projectId:"mcq--lk",
+            storageBucket:"mcq--lk.firebasestorage.app",
+            messagingSenderId:"842986756141",
+            appId:"1:842986756141:web:730e145fa230c7bd1640a4"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(), auth = firebase.auth();
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="flex flex-col min-h-screen">
+<div id="shared-header"></div>
+
+<main class="flex-grow pt-20">
+    <div class="bg-slate-50 border-b border-slate-200 py-3">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-sm text-slate-500 font-semibold">
+            <span id="breadcrumb-inner"></span>
+        </div>
+    </div>
+
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 fade-in-up">
+        <div class="mb-10">
+            <a id="back-btn" href="grades.html"
+               class="flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold mb-6 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                Back
+            </a>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900">Available Papers</h2>
+            <p id="page-subtitle" class="text-slate-500 mt-2 font-medium"></p>
+        </div>
+
+        <div id="papers-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="col-span-full text-center py-16">
+                <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+                <p class="text-slate-400 font-semibold text-sm">Loading papers…</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div id="shared-footer"></div>
+<div id="shared-modals"></div>
+
+<script src="db.js"></script>
+<script src="router.js"></script>
+<script src="shared-html.js"></script>
+<script src="nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    injectSharedHTML('subjects');
+    const p       = getParams();
+    const grade   = parseInt(p.grade) || 13;
+    const stream  = p.stream  || null;
+    const subject = p.subject || '';
+    const type    = p.type    || 'National Past Papers';
+    const year    = p.year    || '';
+    const term    = p.term    || null;   // only for School/Provincial
+    const isPast  = type === 'National Past Papers';
+
+    // ── Back button ──────────────────────────────────────────
+    const backHref = (isPast)
+        ? buildUrl('years.html',  { grade, stream:stream||'', subject, type })
+        : buildUrl('terms.html',  { grade, stream:stream||'', subject, type, year });
+    const backEl = document.getElementById('back-btn');
+    backEl.href = backHref;
+    backEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg> ${isPast ? 'Back to Years' : 'Back to Terms'}`;
+
+    // ── Subtitle ──────────────────────────────────────────────
+    const termLabel = term ? ` — ${term} Test` : '';
+    document.getElementById('page-subtitle').textContent =
+        `${subject} — ${PAPER_TYPE_LABELS[type]||type} — ${year}${termLabel}`;
+
+    // ── SEO ──────────────────────────────────────────────────
+    setSEOMeta({
+        title: `${subject} Grade ${grade} ${year}${term?' '+term:''} Papers`,
+        description: `Browse and start ${subject} Grade ${grade} ${type} papers for ${year}${term?' '+term:''} on Sahasra.`,
+        canonical: 'papers.html' + window.location.search
+    });
+
+    // ── Breadcrumb ────────────────────────────────────────────
+    const bcSteps = [{ label:'Home', href:'index.html' }, { label:'Grades', href:'grades.html' }];
+    if (grade === 12 || grade === 13) {
+        bcSteps.push({ label:`Grade ${grade}`, href: buildUrl('stream.html', { grade }) });
+        if (stream) bcSteps.push({ label: stream, href: buildUrl('subjects.html', { grade, stream }) });
+    } else {
+        bcSteps.push({ label:`Grade ${grade}`, href: buildUrl('subjects.html', { grade }) });
+    }
+    bcSteps.push({ label: subject, href: buildUrl('category.html', { grade, stream:stream||'', subject }) });
+    bcSteps.push({ label: PAPER_TYPE_LABELS[type]||type, href: buildUrl('years.html', { grade, stream:stream||'', subject, type }) });
+    if (!isPast && term) {
+        bcSteps.push({ label: String(year), href: buildUrl('terms.html', { grade, stream:stream||'', subject, type, year }) });
+        bcSteps.push({ label: term, href: null });
+    } else {
+        bcSteps.push({ label: String(year), href: null });
+    }
+    renderBreadcrumb(bcSteps);
+    injectBreadcrumbSchema(bcSteps);
+
+    // ── Load + render ─────────────────────────────────────────
+    loadFromFirebase().then(renderPapers).catch(renderPapers);
+    db.collection('papers').onSnapshot(() => { loadFromFirebase().then(renderPapers); }, () => {});
+
+    function renderPapers() {
+        const gradeStr = `Grade ${grade}`;
+        const filtered = publishedPapers.filter(pp =>
+            pp.grade     === gradeStr  &&
+            pp.subject   === subject   &&
+            pp.paperType === type      &&
+            String(pp.year) === String(year) &&
+            (term ? pp.term === term : true)
+        );
+
+        const grid = document.getElementById('papers-grid');
+
+        if (!filtered.length) {
+            grid.innerHTML = `
+            <div class="col-span-full text-center py-20">
+                <div class="w-20 h-20 mx-auto rounded-full bg-slate-100 flex items-center justify-center mb-4 text-4xl">📭</div>
+                <h3 class="text-xl font-extrabold text-slate-700 mb-2">No Papers Available Yet</h3>
+                <p class="text-slate-400 text-sm">No papers published for this selection. Check back soon or try a different year/term.</p>
+                <a href="${backHref}" class="inline-block mt-6 px-6 py-3 bg-blue-600 text-white font-bold rounded-xl text-sm hover:bg-blue-700 transition">← Go Back</a>
+            </div>`;
+            return;
+        }
+
+        // ── Inject JSON-LD ItemList for paper links ──────────
+        const listScript = document.createElement('script');
+        listScript.type = 'application/ld+json';
+        listScript.text = JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": `${subject} Grade ${grade} ${year} Papers`,
+            "itemListElement": filtered.map((pp, i) => {
+                const seoName = pp.paperName.trim().replace(/\s+/g, '-');
+                return {
+                    "@type": "ListItem",
+                    "position": i + 1,
+                    "name": pp.paperName,
+                    "url": window.location.origin + `/Paper.html?id=${encodeURIComponent(pp.id)}&name=${encodeURIComponent(seoName)}`
+                };
+            })
+        });
+        document.head.appendChild(listScript);
+
+        const termColors = { 'First Term':'blue','Second Term':'emerald','Third Term':'amber' };
+        grid.innerHTML = filtered.map((pp, idx) => {
+            const subs = studentSubmissions.filter(s => s.paperId === pp.id);
+            const tc   = pp.term ? (termColors[pp.term] || 'slate') : null;
+            const seoName = pp.paperName.trim().replace(/\s+/g, '-');
+            const paperUrl = `Paper.html?id=${encodeURIComponent(pp.id)}&name=${encodeURIComponent(seoName)}`;
+
+            return `
+            <a href="${paperUrl}"
+               class="hover-card p-7 rounded-3xl group border-2 border-transparent hover:border-blue-500 flex flex-col gap-3 no-underline"
+               title="${pp.paperName}">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center
+                                text-xl font-black group-hover:scale-110 transition-transform shrink-0">${idx + 1}</div>
+                    ${pp.term ? `<span class="text-[10px] font-black uppercase px-2 py-1 rounded-full bg-${tc}-100 text-${tc}-700 tracking-wide">${pp.term}</span>` : `<span class="text-[10px] font-black uppercase px-2 py-1 rounded-full bg-blue-100 text-blue-700 tracking-wide">${pp.year}</span>`}
+                </div>
+                <div>
+                    <h3 class="text-base font-extrabold text-slate-900 leading-snug">${pp.paperName}</h3>
+                    <p class="text-xs text-slate-400 font-semibold mt-1">${pp.grade} • ${pp.subject} • ${pp.year||''}</p>
+                </div>
+                <div class="flex items-center gap-3 mt-auto pt-2 border-t border-slate-100 flex-wrap">
+                    <span class="text-xs font-bold text-slate-500">📝 ${pp.questionCount} Questions</span>
+                    <span class="text-xs font-bold text-purple-600">👥 ${subs.length} Attempts</span>
+                    ${pp.timeLimit ? `<span class="text-xs font-bold text-orange-600">⏱ ${pp.timeLimit} min</span>` : ''}
+                </div>
+                <div class="flex items-center gap-2 mt-1">
+                    <div class="flex-1 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl text-center
+                                group-hover:bg-blue-700 transition">
+                        Start Paper →
+                    </div>
+                    <div title="Copy direct link"
+                         onclick="event.preventDefault();event.stopPropagation();
+                                  navigator.clipboard.writeText(window.location.origin+'/Paper.html?id='+encodeURIComponent('${pp.id}'))
+                                  .then(function(){this.innerHTML='✅';setTimeout(function(){document.querySelectorAll('[data-copy]').forEach(e=>e.innerHTML='🔗')},1500)}.bind(this))
+                                  .catch(function(){prompt('Copy:',window.location.origin+'/Paper.html?id='+encodeURIComponent('${pp.id}'))})"
+                         data-copy="1"
+                         class="w-10 h-10 rounded-xl bg-slate-100 text-slate-500 hover:bg-blue-100 hover:text-blue-600
+                                flex items-center justify-center transition shrink-0 cursor-pointer">
+                        🔗
+                    </div>
+                </div>
+            </a>`;
+        }).join('');
+    }
+});
+</script>
+</body>
+</html>
